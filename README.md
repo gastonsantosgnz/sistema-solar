@@ -7,15 +7,18 @@ incrustado en un solo archivo.
 ## Compilar
 
 ```bash
-node build.mjs          # -> ../sistema-solar.html  y  publicar/index.html
+node build.mjs          # -> dist/sistema-solar.html  y  publicar/index.html
 node generar-sitio.mjs  # -> páginas estáticas, sitemap y robots
 ```
+
+No hay dependencias: solo Node 18 o superior. `three.js` viene incrustado en el
+repositorio, así que no hace falta `npm install`.
 
 `build.mjs` produce dos salidas del mismo código:
 
 | Salida | Qué es | Peso |
 |---|---|---|
-| `../sistema-solar.html` | Fragmento sin `<html>`/`<head>`, para el Artifact. Todo incrustado como data URI porque ahí no se permiten peticiones externas. | 2.9 MB en un archivo |
+| `dist/sistema-solar.html` | Fragmento sin `<html>`/`<head>`, para el Artifact. Todo incrustado como data URI porque ahí no se permiten peticiones externas. | 2.9 MB en un archivo |
 | `publicar/index.html` | Documento completo con SEO y Open Graph. Texturas y catálogos salen como archivos aparte. | 815 KB + 1.7 MB cacheables |
 
 En la versión del sitio, cada textura y cada catálogo lleva el hash de su contenido en
@@ -106,11 +109,24 @@ La dirección refleja la vista y se puede restaurar:
 
 - Órbitas planetarias: JPL, *Approximate Positions of the Major Planets* (1800–2050)
 - Cuerpos menores: JPL Small-Body Database (11 850 asteroides y transneptunianos)
+- Sondas: trayectorias reales del JPL Horizons, interpoladas con Catmull-Rom
 - Luna: teoría ELP truncada (Meeus, *Astronomical Algorithms*, cap. 47)
 - Estrellas: catálogo HYG v4.1, magnitud ≤ 6.5
-- Constelaciones: Stellarium
+- Constelaciones: d3-celestial de Olaf Frohn (BSD-3)
 - Mapas de superficie: NASA Blue Marble y Visible Earth; Solar System Scope (CC BY 4.0)
 - Three.js r169 (MIT), incrustado
+
+Las licencias y la atribución completa están en [CREDITOS.md](CREDITOS.md).
+**Importante**: `stars.json` deriva del catálogo HYG, que es CC BY-SA 4.0, así que
+ese archivo arrastra la cláusula ShareAlike aunque el resto del código no.
+
+## Publicar en GitHub Pages
+
+El repositorio trae un workflow (`.github/workflows/deploy.yml`) que compila y
+publica en cada push a `main`. Para activarlo: **Settings → Pages → Source:
+GitHub Actions**. Si usas dominio propio, define la variable de repositorio
+`SITIO_URL` (Settings → Secrets and variables → Actions → Variables) con la URL
+completa, para que las canónicas y el sitemap apunten ahí.
 
 ## Límites conocidos
 
