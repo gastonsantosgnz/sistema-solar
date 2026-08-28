@@ -29,9 +29,19 @@ caché sola, sin tocar configuración.
 Todo el HTML sale en **ASCII puro**: los acentos van escapados, así que no depende de
 que el servidor mande la cabecera `charset` correcta.
 
-Las rutas de los assets son absolutas (`/tex/...`), porque con el rewrite de
-`/fecha/2026-11-28` una ruta relativa resolvería a `/fecha/tex/...` y daría 404. Esto
-supone que el sitio vive en la raíz del dominio.
+Las rutas de los assets son absolutas, porque con el rewrite de `/fecha/2026-11-28`
+una ruta relativa resolvería a `/fecha/tex/...` y daría 404. El prefijo sale de
+`SITIO_URL`: si el sitio vive en un subdirectorio (como en GitHub Pages, que sirve
+cada repo bajo `/<repo>/`), las rutas se generan con ese prefijo automáticamente.
+
+```bash
+SITIO_URL=https://usuario.github.io/sistema-solar node build.mjs   # base /sistema-solar/
+SITIO_URL=https://midominio.com node build.mjs                     # base /
+```
+
+El build también escribe `publicar/404.html` como copia del index: GitHub Pages no
+admite rewrites, pero sirve `404.html` para rutas inexistentes, así que las rutas
+bonitas (`/fecha/...`) funcionan igual.
 
 ## Publicar
 

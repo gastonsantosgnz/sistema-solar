@@ -25,6 +25,13 @@ const app = fuentes.map(f => R('src/' + f)).join('\n\n');
 
 const NO_ASCII = new RegExp('[\\u0080-\\uffff]', 'g');
 
+/* Dónde vivirá el sitio. Con una sola variable quedan bien las rutas de los
+   assets y las URL canónicas: GitHub Pages sirve los repos en un subdirectorio
+   (/sistema-solar/), y ahí una ruta absoluta /tex/... apunta fuera del sitio. */
+const SITIO = (process.env.SITIO_URL || '').replace(/\/+$/, '');
+const BASE = process.env.BASE_URL
+  || (SITIO ? (new URL(SITIO).pathname.replace(/\/+$/, '') + '/') : '/');
+
 /* ============================================================
    Dos modos de empaquetado del mismo código:
 
@@ -55,14 +62,14 @@ function preambulo(modo){
   for (const f of archivosTex){
     const buf = fs.readFileSync(dir + 'texturas/' + f);
     const nombre = f.replace('.jpg','') + '.' + hash(buf) + '.jpg';
-    tex[f.replace('.jpg','')] = '/tex/' + nombre;      // absoluta: /fecha/... reescribe a index.html
+    tex[f.replace('.jpg','')] = BASE + 'tex/' + nombre;
     assets.push({ ruta: 'tex/' + nombre, buf });
   }
   const datos = {};
   for (const [clave, txt] of [['estrellas', stars], ['asteroides', asts], ['sondas', sondas]]){
     const buf = Buffer.from(txt);
     const nombre = clave + '.' + hash(buf) + '.json';
-    datos[clave] = '/datos/' + nombre;
+    datos[clave] = BASE + 'datos/' + nombre;
     assets.push({ ruta: 'datos/' + nombre, buf });
   }
   const pre = `const TEXTURAS = ${JSON.stringify(tex)};
@@ -132,7 +139,7 @@ const cabezaSEO = `
 <meta property="og:title" content="Sistema Solar a Escala">
 <meta property="og:description" content="${DESC}">
 <meta property="og:type" content="website">
-<meta property="og:image" content="/og.png">
+<meta property="og:image" content="${SITIO || ''}/og.png">
 <meta property="og:locale" content="es_MX">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#05060a">
@@ -156,6 +163,9 @@ for (const sub of ['tex', 'datos']){
 }
 for (const a of S.assets) fs.writeFileSync(dir + 'publicar/' + a.ruta, a.buf);
 fs.copyFileSync(dir + 'assets/og.png', dir + 'publicar/og.png');
+/* GitHub Pages no admite rewrites: sirve 404.html para cualquier ruta que no
+   exista, así que una copia del index hace de comodín para /fecha/...        */
+fs.writeFileSync(dir + 'publicar/404.html', publico);
 fs.writeFileSync(dir + 'publicar/index.html', publico);
 
 /* cabeceras de caché: los assets llevan hash, así que son inmutables */
@@ -187,6 +197,7 @@ const kbA = (fs.statSync(dir + 'dist/sistema-solar.html').size / 1024).toFixed(0
 const kbS = (fs.statSync(dir + 'publicar/index.html').size / 1024).toFixed(0);
 const kbAssets = (S.assets.reduce((n, a) => n + a.buf.length, 0) / 1024).toFixed(0);
 const noAscii = [...A.html].filter(c => c.charCodeAt(0) > 127).length;
+console.log(`base: ${BASE}${SITIO ? '  ·  sitio: ' + SITIO : ''}`);
 console.log(`dist/sistema-solar.html: ${kbA} KB en un archivo`);
 console.log(`sitio:    ${kbS} KB de HTML + ${S.assets.length} assets con hash (${kbAssets} KB cacheables)`);
 console.log(`${archivosTex.length} texturas · ${pares.length} símbolos de three · ${fuentes.length} módulos · no ASCII: ${noAscii}`);

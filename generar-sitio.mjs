@@ -17,7 +17,9 @@ const API = new Function(SRC + `
 const { DEG, AU, J2000, R_SOL, R_TIERRA, R_LUNA, dateToJD, jdToDate,
         planetPos, lunaGeo, buscarEclipses, BODIES, MOONS, MENORES, ELEM } = API;
 
-const SITIO = process.env.SITIO_URL || 'https://sistemasolar.example';
+const SITIO = (process.env.SITIO_URL || 'https://sistemasolar.example').replace(/\/+$/, '');
+const BASE = process.env.BASE_URL
+  || (new URL(SITIO).pathname.replace(/\/+$/, '') + '/');
 const OUT = dir + 'publicar/';
 
 const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -200,7 +202,7 @@ ${cuerpo}
 <footer>
 Posiciones calculadas con elementos keplerianos del JPL y la teoría lunar ELP (Meeus).
 Los eclipses se determinan por geometría de conos de sombra, no de un calendario precargado.
-Las horas son UTC. · <a href="/">Abrir el simulador</a>
+Las horas son UTC. · <a href="${BASE}">Abrir el simulador</a>
 </footer>
 </main>
 </body>
@@ -240,7 +242,7 @@ eclipses.forEach((e, i) => {
   if (solar && e.gamma !== undefined) filas.push(['Gamma', e.gamma.toFixed(3)]);
 
   const cuerpo = `
-<nav class="migas"><a href="/">Sistema Solar</a> / <a href="/explorar/">Eclipses</a> / ${esc(isoCorto(e.jd))}</nav>
+<nav class="migas"><a href="${BASE}">Sistema Solar</a> / <a href="${BASE}explorar/">Eclipses</a> / ${esc(isoCorto(e.jd))}</nav>
 <div class="eyebrow">Eclipse ${esc(e.tipo)} de ${solar ? 'Sol' : 'Luna'}</div>
 <h1>${esc(e.titulo)}</h1>
 <p>${esc(explica)}</p>
@@ -250,15 +252,15 @@ ${filas.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('
 <p>Puedes situarte en el momento exacto y ver la geometría desde el espacio: la sombra
 proyectada sobre la superficie, la posición real de la Tierra y la Luna, y el terminador
 cayendo sobre la geografía correcta para esa hora.</p>
-<a class="cta" href="/?f=${isoMin(e.jd - 35/1440)}&amp;foco=${solar ? 'tierra' : 'luna'}&amp;d=${solar ? 30000 : 5600}&amp;vel=2">Ver este eclipse en 3D</a>
+<a class="cta" href="${BASE}?f=${isoMin(e.jd - 35/1440)}&amp;foco=${solar ? 'tierra' : 'luna'}&amp;d=${solar ? 30000 : 5600}&amp;vel=2">Ver este eclipse en 3D</a>
 <h2>Cómo se calculó</h2>
 <p>La fecha no viene de una tabla: se busca el instante en que la Luna y el Sol quedan
 alineados en longitud eclíptica, y después se mide si los conos de sombra realmente se
 cruzan con la Tierra. El tipo (${esc(e.tipo)}) sale de comparar los radios angulares de
 los discos en ese instante.</p>
 <nav class="nav">
-<span>${prev ? `<a href="/eclipse/${prev.slug}/">← ${esc(prev.titulo.replace('Eclipse ',''))}</a>` : ''}</span>
-<span>${next ? `<a href="/eclipse/${next.slug}/">${esc(next.titulo.replace('Eclipse ',''))} →</a>` : ''}</span>
+<span>${prev ? `<a href="${BASE}eclipse/${prev.slug}/">← ${esc(prev.titulo.replace('Eclipse ',''))}</a>` : ''}</span>
+<span>${next ? `<a href="${BASE}eclipse/${next.slug}/">${esc(next.titulo.replace('Eclipse ',''))} →</a>` : ''}</span>
 </nav>`;
 
   const html = pagina({
@@ -305,19 +307,19 @@ for (const b of fichas){
   }
   const desc = `${b.nombre}: datos reales, órbita y posición actual. ${b.nota || ''}`.slice(0, 180);
   const cuerpo = `
-<nav class="migas"><a href="/">Sistema Solar</a> / <a href="/explorar/">Cuerpos</a> / ${esc(b.nombre)}</nav>
+<nav class="migas"><a href="${BASE}">Sistema Solar</a> / <a href="${BASE}explorar/">Cuerpos</a> / ${esc(b.nombre)}</nav>
 <div class="eyebrow">${esc(b.tipo)}</div>
 <h1>${esc(b.nombre)}</h1>
 ${b.nota ? `<p>${esc(b.nota)}</p>` : ''}
 <dl class="datos">
 ${filas.map(([k,v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('\n')}
 </dl>
-<a class="cta" href="/?foco=${b.id}">Ver ${esc(b.nombre)} en 3D</a>
+<a class="cta" href="${BASE}?foco=${b.id}">Ver ${esc(b.nombre)} en 3D</a>
 <h2>Dónde está ahora</h2>
 <p>El simulador calcula su posición para la fecha y hora que le pidas, con elementos
 orbitales del JPL. Puedes adelantar el tiempo y ver cómo recorre su órbita, o retroceder
 a cualquier momento entre 1800 y 2050.</p>
-<nav class="nav"><span><a href="/explorar/">← Todos los cuerpos</a></span></nav>`;
+<nav class="nav"><span><a href="${BASE}explorar/">← Todos los cuerpos</a></span></nav>`;
   fs.mkdirSync(`${OUT}cuerpo/${b.id}`, { recursive: true });
   fs.writeFileSync(`${OUT}cuerpo/${b.id}/index.html`, pagina({
     titulo: `${b.nombre} — datos, órbita y simulador 3D`,
@@ -333,10 +335,10 @@ for (const e of eclipses){
   (porAnio[y] ||= []).push(e);
 }
 const listaCuerpos = fichas.filter(b => b.id !== 'sol')
-  .map(b => `<li><a href="/cuerpo/${b.id}/">${esc(b.nombre)}<em>${esc(b.tipo)}</em></a></li>`).join('\n');
+  .map(b => `<li><a href="${BASE}cuerpo/${b.id}/">${esc(b.nombre)}<em>${esc(b.tipo)}</em></a></li>`).join('\n');
 const listaEclipses = Object.keys(porAnio).sort().map(y =>
   `<div class="grupo-anio">${y}</div>\n<ul class="lista">\n` +
-  porAnio[y].map(e => `<li><a href="/eclipse/${e.slug}/">${esc(e.titulo.replace(/^Eclipse /,'Eclipse '))}<em>${esc(horaUTC(e.jd))}</em></a></li>`).join('\n') +
+  porAnio[y].map(e => `<li><a href="${BASE}eclipse/${e.slug}/">${esc(e.titulo.replace(/^Eclipse /,'Eclipse '))}<em>${esc(horaUTC(e.jd))}</em></a></li>`).join('\n') +
   `\n</ul>`).join('\n');
 
 fs.mkdirSync(OUT + 'explorar', { recursive: true });
@@ -345,7 +347,7 @@ fs.writeFileSync(OUT + 'explorar/index.html', pagina({
   desc: `Todos los eclipses de Sol y Luna entre 2026 y 2040 calculados por geometría de sombras, y fichas de cada planeta, asteroide y cometa del simulador.`,
   canonica: '/explorar/',
   cuerpo: `
-<nav class="migas"><a href="/">Sistema Solar</a> / Explorar</nav>
+<nav class="migas"><a href="${BASE}">Sistema Solar</a> / Explorar</nav>
 <div class="eyebrow">Índice</div>
 <h1>Eclipses y cuerpos</h1>
 <p>Cada eclipse de esta lista se calculó resolviendo la geometría real de las sombras,

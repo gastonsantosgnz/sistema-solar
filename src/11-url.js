@@ -36,17 +36,19 @@ const CAPAS_URL = [
 function aplicarURL(){
   let ruta = location.pathname;
   urlBase = ruta;
+  const fin = () => { if (!urlBase.endsWith('/')) urlBase += '/'; };
   const q = new URLSearchParams(location.search);
   let jd = null, foco = null;
 
   // rutas bonitas: /fecha/... /date/... /cuerpo/<id>[/<fecha>]
   let m = ruta.match(/\/(?:fecha|date)\/([^/]+)\/?$/);
-  if (m){ jd = parseFechaURL(decodeURIComponent(m[1])); urlBase = ruta.slice(0, m.index) || '/'; }
+  if (m){ jd = parseFechaURL(decodeURIComponent(m[1])); urlBase = ruta.slice(0, m.index) || '/'; fin(); }
   m = ruta.match(/\/cuerpo\/([a-z0-9-]+)(?:\/([^/]+))?\/?$/);
   if (m){
     if (porId[m[1]]) foco = m[1];
     if (m[2]) jd = parseFechaURL(decodeURIComponent(m[2]));
     urlBase = ruta.slice(0, m.index) || '/';
+    fin();
   }
 
   if (q.get('f')) jd = parseFechaURL(q.get('f')) ?? jd;
