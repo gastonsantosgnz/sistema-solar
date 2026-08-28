@@ -128,6 +128,19 @@ GitHub Actions**. Si usas dominio propio, define la variable de repositorio
 `SITIO_URL` (Settings → Secrets and variables → Actions → Variables) con la URL
 completa, para que las canónicas y el sitemap apunten ahí.
 
+## Licencia
+
+El código de este proyecto está bajo **[AGPL-3.0](LICENSE)**. En corto: puedes
+usarlo, estudiarlo y modificarlo libremente, pero si lo despliegas como servicio
+web —modificado o no— tienes que ofrecer el código fuente a quien lo use.
+
+Los datos y las imágenes de terceros conservan su propia licencia; la lista
+completa está en **[CREDITOS.md](CREDITOS.md)**. Una en particular importa:
+`stars.json` deriva del catálogo HYG, que es CC BY-SA 4.0, así que ese archivo
+se redistribuye bajo esa licencia y no bajo AGPL.
+
+Si necesitas una licencia distinta para un uso comercial cerrado, escribe.
+
 ## Límites conocidos
 
 - Precisión planetaria de minutos de arco, no de segundos (elementos aproximados del JPL).
