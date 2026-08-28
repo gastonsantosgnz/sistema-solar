@@ -1,0 +1,7 @@
+# salidas de compilación (se regeneran con `node build.mjs` y `node generar-sitio.mjs`)
+dist/
+publicar/
+
+node_modules/
+.DS_Store
+*.log
