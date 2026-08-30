@@ -130,6 +130,46 @@ function paleta(def){
   return p.map(hexV3);
 }
 
+/* ---------- formas rocosas ----------
+   Los cuerpos chicos no son esferas: se deforma la esfera base con lóbulos
+   sinusoidales y rugosidad, con semilla determinista por id (la misma papa
+   en cada visita). Ceres e Higía se quedan redondos porque lo son.        */
+function azarDe(sem){
+  let s = sem | 0;
+  return function(){
+    s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ s >>> 15, 1 | s);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function geoRocosa(def){
+  const g = esferaGeo.clone();
+  let sem = 0;
+  for (const ch of def.id) sem = (sem * 31 + ch.charCodeAt(0)) | 0;
+  const rnd = azarDe(sem);
+  const fuerza = def.r > 150 ? 0.055 : def.r > 20 ? 0.12 : 0.2;
+  const alarg = 1 + (def.r < 20 ? 0.45 + rnd() * 0.55 : 0.1 + rnd() * 0.18);
+  const K = [], A = [];
+  for (let k = 0; k < 6; k++){
+    K.push(new THREE.Vector3(rnd()*2 - 1, rnd()*2 - 1, rnd()*2 - 1).normalize()
+      .multiplyScalar(1.2 + rnd() * (k < 3 ? 2.2 : 6.5)));
+    A.push((k < 3 ? 0.9 : 0.45) * (0.5 + rnd() * 0.5));
+  }
+  const p = g.attributes.position;
+  const v = new THREE.Vector3(), n = new THREE.Vector3();
+  for (let i = 0; i < p.count; i++){
+    v.fromBufferAttribute(p, i);
+    n.copy(v).normalize();
+    let d = 1;
+    for (let k = 0; k < 6; k++)
+      d += fuerza * A[k] * Math.sin(n.x*K[k].x + n.y*K[k].y + n.z*K[k].z + k * 1.7);
+    p.setXYZ(i, n.x * d * alarg, n.y * d, n.z * d);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
 function crearCuerpo(def, esLuna){
   const pivot = new THREE.Object3D();
   scene.add(pivot);
@@ -164,7 +204,9 @@ function crearCuerpo(def, esLuna){
   const mat = new THREE.ShaderMaterial({
     uniforms: uni, vertexShader: PLANET_VERT, fragmentShader: PLANET_FRAG, defines
   });
-  const mesh = new THREE.Mesh(esferaGeo, mat);
+  const rocosa = !def.sonda && def.id !== 'ceres' && def.id !== 'higia' &&
+                 ((def.el && def.r <= 270) || (esLuna && def.r < 150));
+  const mesh = new THREE.Mesh(rocosa ? geoRocosa(def) : esferaGeo, mat);
   mesh.frustumCulled = false;
   pivot.add(mesh);
 

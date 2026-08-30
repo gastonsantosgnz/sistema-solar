@@ -91,7 +91,7 @@ function armarComparacion(ids){
     const grupo = new THREE.Group();
     grupo.position.set(cx, r, 0);                       // alineados por la base (y = 0)
     grupo.quaternion.setFromAxisAngle(COMP_Z, -(c.def.tilt || 0) * DEG).premultiply(COMP_POSE);
-    const mesh = new THREE.Mesh(esferaGeo, c.mesh.material);
+    const mesh = new THREE.Mesh(c.mesh.geometry, c.mesh.material);   // hereda la forma rocosa
     mesh.scale.setScalar(r);
     grupo.add(mesh);
     let ring = null, nubes = null;

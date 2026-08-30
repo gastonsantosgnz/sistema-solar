@@ -21,7 +21,10 @@ la escalera de velocidades llega hasta −10 años/s.
 Al descender sobre un cuerpo con atmósfera (Tierra, Venus, Marte, Titán) un velo
 de dispersión pinta el cielo: azul y bruma de horizonte de día, banda cálida de
 crepúsculo hacia el Sol, transparente y estrellado de noche. De cerca, nubes y
-suelo se enriquecen con detalle procedural anclado a la superficie.
+suelo se enriquecen con detalle procedural anclado a la superficie. Los cuerpos
+menores y las lunas pequeñas tienen formas rocosas irregulares — deterministas
+por cuerpo, así que Eros luce siempre el mismo cacahuate — mientras que Ceres e
+Higía se quedan redondos porque de verdad lo son.
 
 El **vuelo libre** lleva instrumentos: velocímetro de cinta logarítmica con hitos
 reales por el camino (del sonido a la Voyager, la sonda Parker, la luz y miles de
