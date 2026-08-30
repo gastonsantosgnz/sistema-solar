@@ -131,6 +131,13 @@ function paso(ahora){
       if (fin) fin();
     }
   } else if (state.playing) state.jd += state.rate * dt;
+  renderCuadro(dt);
+  actualizarHUD();
+}
+
+/* Un cuadro completo: posiciones, cámara, escena y render. Separado de
+   paso() para poder renderizar fuera del ciclo rAF (p. ej. la postal). */
+function renderCuadro(dt){
   actualizarPosiciones(state.jd);
   actualizarCamara(dt);
 
@@ -260,7 +267,7 @@ function paso(ahora){
   nubeJD.value = T;
   nubeCamKm.value.set(cam[0], cam[1], cam[2]);
   nubeBelt.visible = state.verAsteroides;
-  nubeTno.visible = state.verAsteroides;
+  nubeTno.visible = state.verTrans;
 
   // órbitas: las heliocéntricas viven en el Sol, las lunares en su planeta.
   // Se desvanecen al acercarse a un cuerpo para no ensuciar la vista.
@@ -314,8 +321,6 @@ function paso(ahora){
   renderer.clear();
   renderer.render(sky.scene, skyCam);
   renderer.render(scene, camera);
-
-  actualizarHUD();
 }
 
 function redimensionar(){

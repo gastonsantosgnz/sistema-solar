@@ -331,6 +331,10 @@ function elegirEn(px, py){
 
 addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
+  if ($('#postal').classList.contains('abierto')){
+    if (k === 'escape') cerrarPostal();
+    return;                       // con el modal abierto, los atajos no tocan la escena
+  }
   teclas[k] = true;
   if (e.shiftKey) teclas['shift'] = true;
   if (e.ctrlKey)  teclas['control'] = true;
@@ -343,6 +347,7 @@ addEventListener('keydown', e => {
   else if (k === 'o'){ state.verOrbitas = !state.verOrbitas; sincronizar(); }
   else if (k === 'c'){ state.verConstelaciones = !state.verConstelaciones; sincronizar(); }
   else if (k === 'm'){ state.verLunas = !state.verLunas; sincronizar(); }
+  else if (k === 'k'){ state.verTrans = !state.verTrans; sincronizar(); }
   else if (k === 'h'){ state.chrome = !state.chrome; document.body.classList.toggle('sin-hud', !state.chrome); }
   else if (k === 'v'){ alternarModo(); }
   else if (k === 'g'){ state.verViaLactea = !state.verViaLactea; sincronizar(); }

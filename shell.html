@@ -252,6 +252,59 @@ input[type=range]:focus-visible{outline:1px solid var(--signal);outline-offset:3
   color:var(--muted);font-family:var(--mono);font-size:16px;cursor:pointer;padding:4px}
 #cerrarAyuda:hover{color:var(--signal)}
 
+/* --- postal --- */
+#postal{position:fixed;inset:0;z-index:41;background:rgba(3,4,7,.86);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:none;place-items:center;padding:20px}
+#postal.abierto{display:grid}
+.cuadroPostal{width:min(440px,100%);background:var(--panel-solido);
+  border:1px solid var(--rule-alta);padding:24px 26px 20px;position:relative;
+  max-height:94vh;overflow-y:auto;display:flex;flex-direction:column;gap:13px;
+  scrollbar-width:thin;scrollbar-color:var(--rule-alta) transparent}
+.cuadroPostal::before,.cuadroPostal::after{content:"";position:absolute;width:7px;height:7px;
+  border:1px solid var(--rule-alta);pointer-events:none}
+.cuadroPostal::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.cuadroPostal::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.cuadroPostal .sub{font-family:var(--cond);font-size:10px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--signal)}
+.cuadroPostal h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:-6px 0 0;
+  letter-spacing:-.01em}
+#cerrarPostal{position:absolute;top:12px;right:14px;background:transparent;border:0;
+  color:var(--muted);font-family:var(--mono);font-size:16px;cursor:pointer;padding:4px;z-index:1}
+#cerrarPostal:hover{color:var(--signal)}
+.formatos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fmt{display:flex;align-items:center;gap:9px;background:transparent;
+  border:1px solid var(--rule);padding:9px 10px;cursor:pointer;color:var(--muted);
+  font-family:var(--cond);font-size:12px;letter-spacing:.05em;text-align:left;transition:.14s}
+.fmt em{display:block;font-style:normal;font-family:var(--mono);font-size:8.5px;
+  color:var(--muted);opacity:.75;margin-top:2px;letter-spacing:.04em}
+.fmt i{flex:none;border:1px solid currentColor;opacity:.7}
+.fmt i.fh{width:21px;height:12px}
+.fmt i.fv{width:12px;height:21px}
+.fmt i.fc{width:16px;height:16px}
+.fmt:hover{border-color:var(--rule-alta);color:var(--ink-2)}
+.fmt.activo{border-color:var(--signal);color:var(--ink)}
+.fmt.activo i{color:var(--signal);opacity:1}
+.fmt:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
+#postalDedic{background:transparent;border:1px solid var(--rule);color:var(--ink);
+  font-family:var(--serif);font-style:italic;font-size:13px;padding:8px 11px;width:100%}
+#postalDedic::placeholder{color:var(--muted);font-family:var(--cond);font-style:normal;
+  font-size:11px;letter-spacing:.04em}
+#postalDedic:focus-visible{outline:1px solid var(--signal);outline-offset:1px}
+#postalVista{position:relative;display:grid;place-items:center;background:var(--void);
+  border:1px solid var(--rule);min-height:200px}
+#postalImg{display:block;max-width:100%;max-height:46vh;opacity:0;transition:opacity .3s ease}
+#postalImg.lista{opacity:1}
+#postalCarga{position:absolute;font-family:var(--mono);font-size:10px;color:var(--muted);
+  letter-spacing:.14em;text-transform:uppercase}
+#btnDescargarPostal{background:rgba(255,91,65,.06);border:1px solid var(--signal);
+  color:var(--signal);font-family:var(--cond);font-size:12px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;padding:10px;cursor:pointer;transition:.14s}
+#btnDescargarPostal:hover{background:rgba(255,91,65,.15)}
+#btnDescargarPostal:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
+#btnDescargarPostal[disabled]{opacity:.45;cursor:default}
+.notaPostal{margin:0;font-family:var(--cond);font-size:10px;line-height:1.5;color:var(--muted)}
+
 #btnMenu,#mandos{display:none}
 #btnMenu{position:absolute;top:10px;right:10px;z-index:14;width:40px;height:40px;
   background:var(--panel);border:1px solid var(--rule-alta);cursor:pointer;
@@ -334,6 +387,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
     <div class="filaFecha">
       <input type="date" id="fechaIn">
       <button class="tb" id="btnHoy" style="width:auto;padding:0 8px" title="Volver a hoy">hoy</button>
+      <button class="tb" id="btnPostal" title="Descargar postal de esta fecha" aria-label="Descargar postal de esta fecha"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><rect x="1" y="1.5" width="11" height="10"/><circle cx="4.3" cy="4.9" r="1.15"/><path d="M1 9.6 4.9 6.8 7.9 9 9.9 7.5 12 9.1"/></svg></button>
     </div>
   </footer>
 
@@ -348,6 +402,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
       <button class="tog on" id="tEtiquetas">Etiquetas <em>L</em></button>
       <button class="tog on" id="tLunas">Lunas <em>M</em></button>
       <button class="tog on" id="tAsteroides">Asteroides <em>A</em></button>
+      <button class="tog on" id="tKuiper">Cinturón de Kuiper <em>K</em></button>
       <button class="tog on" id="tSondas">Sondas <em>S</em></button>
       <button class="tog" id="tConst">Constelaciones <em>C</em></button>
       <button class="tog on" id="tViaLactea">Vía Láctea <em>G</em></button>
@@ -381,6 +436,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
     <div class="panel bloque">
       <h4>Compartir</h4>
       <button id="btnCompartir" class="ancho2">Copiar enlace a esta vista</button>
+      <button id="btnPostal2" class="ancho2">Postal de esta fecha</button>
     </div>
 
     <div class="panel bloque">
@@ -410,6 +466,29 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   <div id="mandos">
     <button id="mAdel" aria-label="Acelerar">&#9650;</button>
     <button id="mAtras" aria-label="Frenar">&#9660;</button>
+  </div>
+</div>
+
+<div id="postal" role="dialog" aria-modal="true" aria-labelledby="postalTitulo">
+  <div class="cuadroPostal">
+    <button id="cerrarPostal" aria-label="Cerrar">&times;</button>
+    <div class="sub">Postal &middot; vista cenital</div>
+    <h2 id="postalTitulo">&mdash;</h2>
+    <div class="formatos">
+      <button class="fmt activo" id="fmtH"><i class="fh"></i><span>Horizontal<em>2560 &times; 1440</em></span></button>
+      <button class="fmt" id="fmtV"><i class="fv"></i><span>Vertical<em>1440 &times; 2560</em></span></button>
+      <button class="fmt" id="fmtC"><i class="fc"></i><span>Cuadrada<em>2048 &times; 2048</em></span></button>
+    </div>
+    <input type="text" id="postalDedic" maxlength="48" autocomplete="off" spellcheck="false"
+           placeholder="Dedicatoria (opcional): aparece bajo la fecha">
+    <div id="postalVista">
+      <img id="postalImg" alt="Vista previa de la postal">
+      <span id="postalCarga">componiendo&hellip;</span>
+    </div>
+    <button id="btnDescargarPostal">Descargar PNG</button>
+    <p class="notaPostal">El sistema visto desde el norte de la ecl&iacute;ptica, con las posiciones
+      reales de la fecha del reloj y un detalle del sistema interior. La imagen se compone
+      en tu navegador.</p>
   </div>
 </div>
 
@@ -444,7 +523,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
         <div class="l"><span>Alabeo</span><kbd>Q E</kbd></div>
         <div class="l"><span>Ocultar la interfaz</span><kbd>H</kbd></div>
         <div class="l"><span>Órbitas · etiquetas · lunas</span><kbd>O L M</kbd></div>
-        <div class="l"><span>Asteroides</span><kbd>A</kbd></div>
+        <div class="l"><span>Asteroides &middot; Kuiper</span><kbd>A K</kbd></div>
         <div class="l"><span>Compartir la vista</span><kbd>enlace</kbd></div>
       </dl>
     </div>

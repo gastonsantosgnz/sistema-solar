@@ -43,6 +43,7 @@ const state = {
   verViaLactea: true,
   verLunas: true,
   verAsteroides: true,
+  verTrans: true,
   verSondas: true,
   viaje: null,
   chrome: true

@@ -10,6 +10,7 @@ function sincronizar(){
   $('#tViaLactea').classList.toggle('on', state.verViaLactea);
   $('#tLuz').classList.toggle('on', state.luzReal);
   $('#tAsteroides').classList.toggle('on', state.verAsteroides);
+  $('#tKuiper').classList.toggle('on', state.verTrans);
   $('#tSondas').classList.toggle('on', state.verSondas);
   $('#tVuelo').classList.toggle('on', state.mode === 'free');
   $('#velTxt').textContent = state.playing ? VELOCIDADES[iVel].t : 'pausa';
@@ -46,7 +47,7 @@ function montarControles(){
   const toggles = {
     tOrbitas:'verOrbitas', tEtiquetas:'verEtiquetas', tLunas:'verLunas',
     tConst:'verConstelaciones', tViaLactea:'verViaLactea', tLuz:'luzReal',
-    tAsteroides:'verAsteroides', tSondas:'verSondas'
+    tAsteroides:'verAsteroides', tKuiper:'verTrans', tSondas:'verSondas'
   };
   for (const [id, prop] of Object.entries(toggles)){
     $('#'+id).onclick = () => { state[prop] = !state[prop]; sincronizar(); };

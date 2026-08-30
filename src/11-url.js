@@ -29,7 +29,7 @@ function parseFechaURL(txt){
 
 const CAPAS_URL = [
   ['o','verOrbitas',true], ['e','verEtiquetas',true], ['m','verLunas',true],
-  ['a','verAsteroides',true], ['c','verConstelaciones',false],
+  ['a','verAsteroides',true], ['k','verTrans',true], ['c','verConstelaciones',false],
   ['g','verViaLactea',true], ['z','luzReal',false]
 ];
 
