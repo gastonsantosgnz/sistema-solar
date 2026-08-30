@@ -13,6 +13,8 @@ function sincronizar(){
   $('#tKuiper').classList.toggle('on', state.verTrans);
   $('#tSondas').classList.toggle('on', state.verSondas);
   $('#tVuelo').classList.toggle('on', state.mode === 'free');
+  document.querySelectorAll('#naveSeg button').forEach(b =>
+    b.classList.toggle('activo', (state.vehiculo || '0') === b.dataset.n));
   $('#velTxt').textContent = state.playing ? VELOCIDADES[iVel].t : 'pausa';
   $('#btnPlay').textContent = state.playing ? '❙❙' : '▶';
   document.body.classList.toggle('vuelo', state.mode === 'free');
@@ -68,6 +70,12 @@ function montarControles(){
   $('#btnSistema').onclick = () => { verSistema(); document.body.classList.remove('menu'); };
   $('#btnEventos').onclick = calculaEventos;
   $('#btnPunto').onclick = puntoAzul;
+
+  // secciones plegables del panel lateral
+  document.querySelectorAll('#lateral .bloque').forEach(b => {
+    const h = b.querySelector(':scope > h4');
+    if (h) h.onclick = () => b.classList.toggle('cerrado');
+  });
 
   // menú desplegable en pantallas pequeñas
   $('#btnMenu').onclick = () => document.body.classList.toggle('menu');

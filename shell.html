@@ -110,9 +110,21 @@ h4{margin:0;font-family:var(--cond);font-size:9.5px;font-weight:600;
 #objNota{margin:13px 0 0;padding-top:11px;border-top:1px solid var(--rule);
   font-family:var(--serif);font-style:italic;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
 
-/* --- consola de tiempo --- */
-#consolaTiempo{position:absolute;left:14px;bottom:14px;padding:12px 14px;display:flex;
-  flex-direction:column;gap:9px;width:288px;max-width:calc(100vw - 28px)}
+/* --- columna inferior izquierda: vuelo + consola de tiempo --- */
+#colIzq{position:absolute;left:14px;bottom:14px;width:288px;max-width:calc(100vw - 28px);
+  display:flex;flex-direction:column;gap:8px}
+#tVuelo{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+  background:var(--panel);border:1px solid var(--rule-alta);color:var(--ink-2);
+  font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;padding:8px 12px;cursor:pointer;transition:.14s;
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+#tVuelo em{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  color:var(--rule-alta);border:1px solid var(--rule);padding:1px 5px;transition:.12s}
+#tVuelo:hover{border-color:var(--signal);color:var(--ink)}
+#tVuelo.on{border-color:var(--signal);color:var(--signal);background:rgba(255,91,65,.08)}
+#tVuelo.on em{color:var(--signal);border-color:rgba(255,91,65,.45)}
+#tVuelo:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
+#consolaTiempo{padding:12px 14px;display:flex;flex-direction:column;gap:9px;width:100%}
 .reloj{display:flex;align-items:baseline;gap:9px}
 #fecha{font-family:var(--mono);font-size:17px;font-weight:500;letter-spacing:.01em;
   font-variant-numeric:tabular-nums;color:var(--solar)}
@@ -137,6 +149,14 @@ h4{margin:0;font-family:var(--cond);font-size:9.5px;font-weight:600;
   scrollbar-width:thin;scrollbar-color:var(--rule-alta) transparent;padding-right:1px}
 #lateral::-webkit-scrollbar{width:3px}
 #lateral::-webkit-scrollbar-thumb{background:var(--rule-alta)}
+/* secciones plegables: clic en el encabezado */
+#lateral .bloque>h4{cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+  gap:8px;user-select:none;-webkit-user-select:none;transition:.12s}
+#lateral .bloque>h4:hover{color:var(--ink-2)}
+#lateral .bloque>h4::after{content:"\2013";font-family:var(--mono);font-size:11px;
+  color:var(--rule-alta);line-height:1}
+#lateral .bloque.cerrado>h4::after{content:"+"}
+#lateral .bloque.cerrado>*:not(h4){display:none!important}
 .bloque{padding:11px 12px;display:flex;flex-direction:column;gap:8px;flex:none}
 
 #indice{display:flex;flex-direction:column;gap:9px}
@@ -174,6 +194,18 @@ input[type=range]::-moz-range-thumb{width:9px;height:9px;background:var(--signal
 input[type=range]:focus-visible{outline:1px solid var(--signal);outline-offset:3px}
 
 .pie{font-family:var(--cond);font-size:10px;line-height:1.45;color:var(--muted);margin:6px 0 0}
+#bloqueNave{display:none}
+body.vuelo #bloqueNave{display:flex}
+#naveSeg{display:flex}
+#naveSeg button{flex:1;background:transparent;border:1px solid var(--rule);color:var(--muted);
+  display:grid;place-items:center;
+  padding:6px 0;cursor:pointer;transition:.14s;margin-left:-1px}
+#naveSeg svg{display:block}
+#naveSeg button:first-child{margin-left:0}
+#naveSeg button:hover{color:var(--ink-2);border-color:var(--rule-alta);position:relative;z-index:1}
+#naveSeg button.activo{color:var(--signal);border-color:var(--signal);
+  background:rgba(255,91,65,.07);position:relative;z-index:2}
+#naveSeg button:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
 #avisoEscala{font-family:var(--cond);font-size:10px;line-height:1.45;color:var(--solar);
   border-left:1px solid rgba(232,177,92,.5);padding-left:7px;display:none}
 
@@ -206,6 +238,55 @@ input[type=range]:focus-visible{outline:1px solid var(--signal);outline-offset:3
   letter-spacing:.1em;text-transform:uppercase;padding:6px 5px;cursor:pointer;
   transition:.14s;margin-bottom:5px;justify-content:center}
 #indice button.ancho:focus-visible,#btnVolver:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
+
+/* --- instrumentos de vuelo --- */
+#instrumentos{display:none;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  width:clamp(300px,calc(100vw - 620px),640px);
+  flex-direction:column;gap:5px;padding:10px 16px 8px;
+  pointer-events:none!important}
+body.vuelo #instrumentos{display:flex}
+.instFila{display:flex;align-items:baseline;gap:10px}
+#instVel{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--ink);
+  font-variant-numeric:tabular-nums;letter-spacing:.02em}
+#instVel.c{color:var(--solar)}
+#instTag{display:none;font-style:normal;font-family:var(--cond);font-size:8.5px;
+  font-weight:600;letter-spacing:.18em;color:var(--solar);
+  border:1px solid rgba(232,177,92,.5);padding:1.5px 6px;text-transform:uppercase}
+#instTag.on{display:inline-block}
+#instModo{margin-left:auto;pointer-events:auto;background:transparent;
+  border:1px solid var(--rule);color:var(--muted);font-family:var(--cond);
+  font-size:8.5px;font-weight:600;letter-spacing:.18em;padding:1.5px 7px;
+  cursor:pointer;text-transform:uppercase;transition:.14s}
+#instModo:hover{border-color:var(--rule-alta);color:var(--ink-2)}
+#instModo.on{border-color:var(--signal);color:var(--signal)}
+#instCinta{position:relative;height:36px}
+.cintaEje{position:absolute;left:0;right:0;top:21px;height:1px;background:var(--rule-alta)}
+.ctick{position:absolute;top:18px;width:1px;height:4px;background:var(--rule-alta);opacity:.65}
+.chito{position:absolute;top:0;bottom:0;width:0;font-weight:400;
+  background:transparent;border:0;padding:0 6px;margin-left:-6px;color:inherit;
+  pointer-events:auto;cursor:pointer}
+.chito:hover span{color:var(--ink)}
+.chito.fija span{color:var(--signal)}
+.chito.fija i{background:var(--signal);width:2px;margin-left:-0.5px}
+.chito:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
+.chito i{position:absolute;left:6px;top:14px;width:1px;height:8px;background:rgba(150,160,175,.7)}
+.chito span{position:absolute;left:6px;top:2px;transform:translateX(-50%);
+  font-family:var(--cond);font-size:7.5px;font-weight:600;letter-spacing:.1em;
+  color:var(--muted);white-space:nowrap}
+.chito.ini span{transform:none;left:8px}
+.chito.abajo i{top:22px}
+.chito.abajo span{top:auto;bottom:0}
+.chito.luz i{background:var(--solar);height:12px;top:10px;width:2px;margin-left:-1px}
+.chito.luz span{color:var(--solar)}
+#cintaFill{position:absolute;left:0;top:20px;height:3px;width:0;
+  background:linear-gradient(90deg,rgba(255,91,65,.04),rgba(255,91,65,.55))}
+#cintaAguja{position:absolute;top:11px;width:2px;height:19px;background:var(--signal);
+  margin-left:-1px;display:none}
+#instCtx{margin:0;font-family:var(--cond);font-size:10.5px;color:var(--ink-2);
+  letter-spacing:.03em;min-height:14px}
+#instRumbo{margin:0;font-family:var(--mono);font-size:10px;color:var(--muted);
+  font-variant-numeric:tabular-nums;min-height:13px;transition:opacity .2s}
+#instRumbo b{color:var(--signal);font-weight:500;letter-spacing:.08em}
 
 /* --- lectura inferior derecha --- */
 #lectura{position:absolute;right:14px;bottom:14px;display:flex;gap:14px;align-items:center;
@@ -377,7 +458,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
 @media (max-width:900px) and (min-width:721px){
   #panelObjetivo{width:246px}
   #lateral{width:186px}
-  #consolaTiempo{width:246px}
+  #colIzq{width:246px}
 }
 @media (max-width:720px){
   #panelObjetivo{left:8px;right:58px;top:8px;width:auto;max-width:none;padding:9px 11px}
@@ -388,8 +469,9 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   #objDatos .fila{padding:2.5px 0}
   #objDatos .fila:nth-child(n+5){display:none}
   #objNota{display:none!important}
-  #consolaTiempo{left:8px;right:8px;bottom:8px;width:auto;max-width:none;
-    flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:9px 11px}
+  #colIzq{left:8px;right:8px;bottom:8px;width:auto;max-width:none;gap:6px}
+  #tVuelo{padding:7px 11px}
+  #consolaTiempo{flex-direction:row;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:9px 11px}
   #consolaTiempo .filaFecha{margin-left:auto}
   #fecha{font-size:15px}
   #velTxt{flex:0 0 auto;text-align:left}
@@ -397,11 +479,15 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
     max-height:66vh;z-index:15;transform:translateY(calc(100% + 16px));
     transition:transform .28s cubic-bezier(.3,0,.2,1)}
   body.menu #lateral{transform:none}
-  body.menu #consolaTiempo,body.menu #panelObjetivo{opacity:0;pointer-events:none}
+  body.menu #colIzq,body.menu #panelObjetivo{opacity:0;pointer-events:none}
   #btnMenu{display:flex}
   body.vuelo #mandos{display:flex}
+  body.menu #instrumentos{opacity:0}
+  #instrumentos{left:8px;right:66px;bottom:152px;transform:none;width:auto;padding:8px 10px 6px}
+  #instCtx{display:none}
+  #instVel{font-size:13px}
   #lectura{display:none}
-  #aviso{top:auto;bottom:110px;font-size:12px;padding:9px 13px}
+  #aviso{top:auto;bottom:152px;font-size:12px;padding:9px 13px}
   .etq.estrella{display:none!important}
 }
 @media (max-width:400px){
@@ -431,6 +517,17 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
     <p id="objNota"></p>
   </section>
 
+  <div id="colIzq">
+  <button id="tVuelo"><span>Vuelo libre</span><em>V</em></button>
+  <div class="panel bloque" id="bloqueNave">
+    <h4>Nave</h4>
+    <div id="naveSeg">
+      <button data-n="sonda" title="Sonda" aria-label="Sonda"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 6.5A8.6 8.6 0 0 0 11.5 15"/><path d="M4.6 4.6l7 7"/><circle cx="12.6" cy="12.6" r="1.4"/><path d="M12.6 14v2.2M10.4 16.2h4.4"/></svg></button>
+      <button data-n="nave" title="Nave" aria-label="Nave"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M9 1.6c1.9 1.9 2.7 4.2 2.7 6.8 0 1.7-.4 3.2-1 4.4H7.3c-.6-1.2-1-2.7-1-4.4 0-2.6.8-4.9 2.7-6.8z"/><path d="M6.4 10.4 4 13.2h2.6M11.6 10.4l2.4 2.8h-2.6"/><path d="M8 12.8h2L9 15.6z"/></svg></button>
+      <button data-n="0" title="Sin nave" aria-label="Sin nave"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="9" cy="9" r="6.4"/><path d="M4.5 13.5 13.5 4.5"/></svg></button>
+    </div>
+    <p class="pie">A escala de cabina, no a escala real. Tecla N para alternar.</p>
+  </div>
   <footer id="consolaTiempo" class="panel">
     <div class="reloj"><span id="fecha">—</span><span id="hora">—</span></div>
     <div class="transporte">
@@ -445,14 +542,16 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
       <button class="tb" id="btnPostal" title="Descargar postal de esta fecha" aria-label="Descargar postal de esta fecha"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><rect x="1" y="1.5" width="11" height="10"/><circle cx="4.3" cy="4.9" r="1.15"/><path d="M1 9.6 4.9 6.8 7.9 9 9.9 7.5 12 9.1"/></svg></button>
     </div>
   </footer>
+  </div>
 
   <aside id="lateral">
     <nav id="indice" class="panel bloque">
+      <h4>Cuerpos</h4>
       <button id="btnSistema" class="ancho">Ver todo el sistema</button>
       <button id="btnComparar" class="ancho">Comparar tama&ntilde;os</button>
     </nav>
 
-    <div class="panel bloque">
+    <div class="panel bloque cerrado">
       <h4>Capas</h4>
       <button class="tog on" id="tOrbitas">Órbitas <em>O</em></button>
       <button class="tog on" id="tEtiquetas">Etiquetas <em>L</em></button>
@@ -463,10 +562,9 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
       <button class="tog" id="tConst">Constelaciones <em>C</em></button>
       <button class="tog on" id="tViaLactea">Vía Láctea <em>G</em></button>
       <button class="tog" id="tLuz">Luz real <em>—</em></button>
-      <button class="tog" id="tVuelo">Vuelo libre <em>V</em></button>
     </div>
 
-    <div class="panel bloque">
+    <div class="panel bloque cerrado">
       <h4>Escala</h4>
       <div class="deslizador">
         <div class="cab"><label for="escala" style="font-size:11px;color:var(--muted)">Tamaño de los cuerpos</label><span id="escalaTxt">real</span></div>
@@ -483,30 +581,41 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
       </div>
     </div>
 
-    <div class="panel bloque">
+    <div class="panel bloque cerrado">
       <h4>Eclipses</h4>
       <div id="eventos"><p class="calc">calculando…</p></div>
       <button id="btnEventos" class="ancho2">Buscar desde la fecha del reloj</button>
     </div>
 
-    <div class="panel bloque">
+    <div class="panel bloque cerrado">
       <h4>Compartir</h4>
       <button id="btnCompartir" class="ancho2">Copiar enlace a esta vista</button>
       <button id="btnPostal2" class="ancho2">Postal de esta fecha</button>
     </div>
 
-    <div class="panel bloque">
+    <div class="panel bloque cerrado">
       <h4>Salir del sistema</h4>
       <div id="viajes"></div>
       <button id="btnVolver">Volver a la Tierra</button>
     </div>
 
-    <div class="panel bloque">
+    <div class="panel bloque cerrado">
       <h4>Momentos</h4>
       <button id="btnPunto" class="ancho2">Punto azul pálido · 1990</button>
       <p class="pie">Recrea la foto que tomó la Voyager 1 al mirar atrás desde 40 UA.</p>
     </div>
   </aside>
+
+  <div id="instrumentos" class="panel">
+    <div class="instFila">
+      <b id="instVel">EN REPOSO</b>
+      <em id="instTag">SUPERLUM&Iacute;NICO</em>
+      <button id="instModo" title="Velocidad autom&aacute;tica o fija (clic en un hito de la cinta para fijarla)">AUTO</button>
+    </div>
+    <div id="instCinta"></div>
+    <p id="instCtx"></p>
+    <p id="instRumbo"></p>
+  </div>
 
   <div id="lectura" class="panel">
     <span>ALTURA <b id="lecturaDist">—</b></span>
@@ -606,6 +715,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
         <div class="l"><span>Subir / bajar</span><kbd>R F</kbd></div>
         <div class="l"><span>Acelerar ×22</span><kbd>Shift</kbd></div>
         <div class="l"><span>Alabeo</span><kbd>Q E</kbd></div>
+        <div class="l"><span>Nave &middot; sonda &middot; nada</span><kbd>N</kbd></div>
         <div class="l"><span>Ocultar la interfaz</span><kbd>H</kbd></div>
         <div class="l"><span>Órbitas · etiquetas · lunas</span><kbd>O L M</kbd></div>
         <div class="l"><span>Asteroides &middot; Kuiper</span><kbd>A K</kbd></div>

@@ -51,7 +51,7 @@ for (const c of cuerpos){
   const e = document.createElement('button');
   e.className = 'etq' + (c.esLuna ? ' luna' : '') + (c.def.id === 'sol' ? ' sol' : '');
   e.innerHTML = `<i></i><span>${c.def.nombre}</span>`;
-  e.onclick = ev => { ev.stopPropagation(); enfocar(c.def.id); };
+  e.onclick = ev => { ev.stopPropagation(); irACuerpo(c.def.id); };
   capaEtq.appendChild(e);
   etqs[c.def.id] = e;
 }
@@ -158,6 +158,7 @@ function actualizarHUD(){
   $('#velTxt').textContent = state.playing ? VELOCIDADES[iVel].t : 'pausa';
   $('#lecturaDist').textContent = distKm(c.dist - radioEfectivo(c));
   $('#fps').textContent = Math.round(fps);
+  actualizarInstrumentos();
 }
 
 /* ---------- panel del objetivo ---------- */
@@ -319,6 +320,16 @@ canvas.addEventListener('wheel', e => {
   }
 }, { passive:false });
 
+/* En vuelo libre, elegir un cuerpo solo cambia el objetivo de información
+   (panel, altura, rumbo) sin sacarte del vuelo; en órbita, enfoca normal. */
+function irACuerpo(id){
+  if (state.mode === 'free'){
+    if (!porId[id]) return;
+    state.focus = id;
+    actualizarPanel();
+  } else enfocar(id);
+}
+
 const ray = new THREE.Raycaster();
 function elegirEn(px, py){
   // 1) el cuerpo más cercano al puntero en pantalla (funciona con puntos diminutos)
@@ -330,7 +341,7 @@ function elegirEn(px, py){
     const d = Math.hypot(p.x - px, p.y - py) - Math.min(c.pxRad, 40);
     if (d < mejorD){ mejorD = d; mejor = c; }
   }
-  if (mejor) enfocar(mejor.def.id);
+  if (mejor) irACuerpo(mejor.def.id);
 }
 
 addEventListener('keydown', e => {
@@ -363,6 +374,9 @@ addEventListener('keydown', e => {
   else if (k === 'c'){ state.verConstelaciones = !state.verConstelaciones; sincronizar(); }
   else if (k === 'm'){ state.verLunas = !state.verLunas; sincronizar(); }
   else if (k === 'k'){ state.verTrans = !state.verTrans; sincronizar(); }
+  else if (k === 'n'){
+    elegirVehiculo(state.vehiculo === 'sonda' ? 'nave' : state.vehiculo === 'nave' ? null : 'sonda');
+  }
   else if (k === 'h'){ state.chrome = !state.chrome; document.body.classList.toggle('sin-hud', !state.chrome); }
   else if (k === 'v'){ alternarModo(); }
   else if (k === 'g'){ state.verViaLactea = !state.verViaLactea; sincronizar(); }
@@ -370,7 +384,7 @@ addEventListener('keydown', e => {
   else if (k === 'escape'){ $('#ayuda').classList.remove('abierto'); }
   else if (k >= '0' && k <= '9'){
     const orden = ['sol','mercurio','venus','tierra','marte','jupiter','saturno','urano','neptuno','pluton'];
-    enfocar(orden[+k]);
+    irACuerpo(orden[+k]);
   }
 });
 addEventListener('keyup', e => {
@@ -388,6 +402,8 @@ function alternarModo(){
     state.mode = 'orbit';
     enfocar(state.focus);
   }
+  velVuelo = 0;
+  fijarVel(null);          // al cambiar de modo, la velocidad vuelve a automática
   sincronizar();
 }
 

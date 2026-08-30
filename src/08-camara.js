@@ -15,6 +15,8 @@ const _m = new THREE.Matrix4();
 const EJE_Y = V3(0,1,0), EJE_Z = V3(0,0,1);
 
 let freeYaw = 0, freePitch = 0, freeRoll = 0;
+let velVuelo = 0;                    // km/s con rampa; la leen los instrumentos
+const dirVuelo = [0, 0, 0];          // última dirección de empuje
 const teclas = {};
 
 function dirDesde(yaw, pitch){
@@ -79,7 +81,7 @@ function actualizarCamara(dt){
     camQ.copy(_q).multiply(qp).multiply(qr);
 
     const base = distSuperficieMin() * 0.55 + 2;
-    let v = Math.min(base, 4e9);
+    let v = state.velFija || Math.min(base, 4e9);
     if (teclas['shift']) v *= 22;
     if (teclas['control']) v *= 0.06;
     const fwd = V3(0,0,-1).applyQuaternion(camQ);
@@ -93,7 +95,16 @@ function actualizarCamara(dt){
     if (teclas['r'] || teclas[' ']) { ax += up.x; ay += up.y; az += up.z; }
     if (teclas['f']) { ax -= up.x; ay -= up.y; az -= up.z; }
     const L = Math.hypot(ax,ay,az);
-    if (L > 0){ state.camKm[0] += ax/L*v*dt; state.camKm[1] += ay/L*v*dt; state.camKm[2] += az/L*v*dt; }
+    // rampa de empuje: acelera en ~0.25 s y frena en ~0.15 s. El velocímetro se
+    // mueve de forma creíble y el manejo (auto-escalado, sin inercia) no cambia.
+    if (L > 0){ dirVuelo[0] = ax/L; dirVuelo[1] = ay/L; dirVuelo[2] = az/L; }
+    const vObj = L > 0 ? v : 0;
+    velVuelo += (vObj - velVuelo) * (1 - Math.exp(-dt / (vObj > velVuelo ? 0.25 : 0.15)));
+    if (velVuelo > 0.01){
+      state.camKm[0] += dirVuelo[0]*velVuelo*dt;
+      state.camKm[1] += dirVuelo[1]*velVuelo*dt;
+      state.camKm[2] += dirVuelo[2]*velVuelo*dt;
+    }
     if (teclas['q']) freeRoll += dt * 1.1;
     if (teclas['e']) freeRoll -= dt * 1.1;
   }
@@ -323,6 +334,7 @@ function renderCuadro(dt){
   renderer.clear();
   renderer.render(sky.scene, skyCam);
   renderer.render(scene, camera);
+  if (state.mode === 'free') renderNave(dt);   // pase overlay: el vehículo, si hay
 }
 
 function redimensionar(){

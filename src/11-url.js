@@ -64,6 +64,8 @@ function aplicarURL(){
   if (q.get('esc')){ const k = Math.max(1, Math.min(1000, +q.get('esc'))); state.sizeScale = k; $('#escala').value = Math.log10(k)/3*1000; }
   if (q.get('vel')){ const i = +q.get('vel'); if (i >= 0 && i < VELOCIDADES.length){ iVel = i; state.rate = VELOCIDADES[i].v; } }
   if (q.get('play') === '0') state.playing = false;
+  const nv = q.get('nave');
+  if (nv !== null) state.vehiculo = nv === 'nave' ? 'nave' : nv === '0' ? null : 'sonda';
   if (q.get('capas')){
     for (const tok of q.get('capas').split(',')){
       const off = tok.startsWith('-');
@@ -94,6 +96,7 @@ function serializarURL(){
   if (state.sizeScale > 1.001) q.set('esc', state.sizeScale.toFixed(state.sizeScale < 10 ? 1 : 0));
   if (iVel !== 4) q.set('vel', iVel);
   if (!state.playing) q.set('play', '0');
+  if (state.vehiculo !== 'sonda') q.set('nave', state.vehiculo || '0');
   const capas = [];
   for (const [letra, prop, def] of CAPAS_URL){
     if (state[prop] !== def) capas.push(state[prop] ? letra : '-' + letra);

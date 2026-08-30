@@ -11,6 +11,14 @@ lado a lado a escala real, alineados por la base, con su inclinación axial y
 rotando; el Sol entra completo a la fila. Ambos reutilizan el motor: no añaden
 assets ni peso al archivo.
 
+El **vuelo libre** lleva instrumentos: velocímetro de cinta logarítmica con hitos
+reales por el camino (del sonido a la Voyager, la sonda Parker, la luz y miles de
+veces más allá), velocidad de crucero fijable con un clic en cualquier hito, una
+línea de contexto que traduce la cifra a algo imaginable, y el rumbo con tiempo de
+llegada comparado con el de la luz. Se pilota una **sonda o una nave** procedurales
+(cero assets), con propulsores ligados al empuje y luces de navegación, dibujadas a
+escala de cabina —lo único del universo que no está a escala real, y se declara.
+
 ## Compilar
 
 ```bash
@@ -120,6 +128,7 @@ La dirección refleja la vista y se puede restaurar:
 | `esc` | Exageración del tamaño de los cuerpos (1–1000) |
 | `vel` | Índice de velocidad del tiempo (0–8) |
 | `play` | `0` para empezar en pausa |
+| `nave` | Vehículo del vuelo libre: `sonda` (por defecto), `nave`, `0` = ninguno |
 | `capas` | Lista separada por comas; el prefijo `-` apaga (`c,-o` = constelaciones sí, órbitas no). Letras: `o` órbitas · `e` etiquetas · `m` lunas · `a` asteroides · `k` cinturón de Kuiper · `c` constelaciones · `g` Vía Láctea · `z` luz real |
 
 ## Fuentes de datos

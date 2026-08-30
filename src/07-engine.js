@@ -46,6 +46,8 @@ const state = {
   verTrans: true,
   verSondas: true,
   viaje: null,
+  velFija: null,          // km/s de crucero fijados desde la cinta; null = automática
+  vehiculo: 'sonda',      // 'sonda' | 'nave' | null — el vehículo del vuelo libre
   comparando: false,
   chrome: true
 };
