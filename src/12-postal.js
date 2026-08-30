@@ -441,3 +441,129 @@ $('#postal').addEventListener('click', e => { if (e.target.id === 'postal') cerr
 
 window.sistemaSolar.abrirPostal = abrirPostal;
 window.sistemaSolar.componerPostal = componerPostal;
+
+/* ============================================================
+   CAPTURA DE LA VISTA ACTUAL
+   Lo que se ve, tal cual — cualquier ángulo, con nave y velo
+   atmosférico — a doble resolución, con un pie mínimo.
+   ============================================================ */
+
+function descargarBlob(cv, nombre){
+  cv.toBlob(b => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = nombre;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }, 'image/png');
+}
+
+async function generarCaptura(){
+  const cap = (renderer.capabilities && renderer.capabilities.maxTextureSize) || 4096;
+  const esc = Math.min(2, cap / Math.max(innerWidth, innerHeight));
+  const W = Math.round(innerWidth * esc), H = Math.round(innerHeight * esc);
+  const pr = renderer.getPixelRatio();
+
+  renderer.setPixelRatio(1);
+  renderer.setSize(W, H, false);
+  if (state.comparando) renderComparar(0); else renderCuadro(0);
+  const datos = canvas.toDataURL('image/png');
+  renderer.setPixelRatio(pr);
+  redimensionar();
+  if (state.comparando) renderComparar(0); else renderCuadro(0);
+
+  const im = await cargarImg(datos);
+  const out = document.createElement('canvas');
+  out.width = W; out.height = H;
+  const ctx = out.getContext('2d');
+  ctx.drawImage(im, 0, 0);
+
+  // pie mínimo: esquinas, fecha y origen
+  const u = Math.min(W, H) / 1000;
+  ctx.strokeStyle = 'rgba(140,150,166,.38)';
+  ctx.lineWidth = Math.max(1, 1.2 * u);
+  const me = 24 * u, brazo = 18 * u;
+  for (const [cx, cy, sx, sy] of [[me, me, 1, 1], [W - me, me, -1, 1], [W - me, H - me, -1, -1], [me, H - me, 1, -1]]){
+    ctx.beginPath();
+    ctx.moveTo(cx + sx * brazo, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy + sy * brazo);
+    ctx.stroke();
+  }
+  ctx.font = '400 ' + (13 * u) + 'px "IBM Plex Mono",ui-monospace,Menlo,monospace';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = 'rgba(232,177,92,.85)';
+  ctx.textAlign = 'left';
+  ctx.fillText(fechaTxt(state.jd) + ' · ' + horaTxt(state.jd), 46 * u, H - 44 * u);
+  if (typeof ES_SITIO !== 'undefined' && ES_SITIO){
+    ctx.fillStyle = 'rgba(150,158,172,.8)';
+    ctx.textAlign = 'right';
+    ctx.fillText(location.host, W - 46 * u, H - 44 * u);
+  }
+  return out;
+}
+
+function nombreCaptura(){
+  return 'sistema-solar-vista-' + jdToDate(state.jd).toISOString().slice(0, 10) + '.png';
+}
+
+$('#btnCaptura').onclick = async () => {
+  const btn = $('#btnCaptura');
+  btn.disabled = true;
+  try {
+    descargarBlob(await generarCaptura(), nombreCaptura());
+  } catch (e){ aviso('No se pudo capturar la vista en este navegador.'); }
+  btn.disabled = false;
+};
+
+/* ============================================================
+   COMPARTIR NATIVO (Web Share API)
+   Solo aparece donde el sistema puede compartir archivos —
+   móvil, sobre todo. En desktop no estorba: no existe.
+   ============================================================ */
+
+function soportaCompartir(){
+  try {
+    return !!(navigator.canShare &&
+              navigator.canShare({ files: [new File([''], 'x.png', { type: 'image/png' })] }));
+  } catch (e){ return false; }
+}
+
+function compartirLienzo(cv, nombre, titulo){
+  return new Promise(res => cv.toBlob(async b => {
+    try {
+      await navigator.share({ files: [new File([b], nombre, { type: 'image/png' })], title: titulo });
+    } catch (e){ /* cancelado por el usuario: no es un error */ }
+    res();
+  }, 'image/png'));
+}
+
+if (!soportaCompartir()){
+  $('#btnCompartirVista').style.display = 'none';
+  $('#btnCompartirPostal').style.display = 'none';
+} else {
+  $('#btnCompartirVista').onclick = async () => {
+    const btn = $('#btnCompartirVista');
+    btn.disabled = true;
+    try {
+      await compartirLienzo(await generarCaptura(), nombreCaptura(), 'Sistema solar · ' + fechaTxt(state.jd));
+    } catch (e){ aviso('No se pudo compartir desde este navegador.'); }
+    btn.disabled = false;
+  };
+  $('#btnCompartirPostal').onclick = async () => {
+    const btn = $('#btnCompartirPostal');
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = 'componiendo…';
+    try {
+      const cap = (renderer.capabilities && renderer.capabilities.maxTextureSize) || 4096;
+      const d = POSTAL_DIM[postalFmt];
+      const k = Math.min(1, cap / Math.max(d.w, d.h));
+      const cv = await componerPostal(Math.round(d.w * k), Math.round(d.h * k));
+      await compartirLienzo(cv, 'sistema-solar-' + jdToDate(state.jd).toISOString().slice(0, 10) + '.png',
+                            'Sistema solar · ' + fechaLarga(state.jd));
+    } catch (e){ aviso('No se pudo compartir desde este navegador.'); }
+    btn.disabled = false;
+    btn.textContent = 'Compartir…';
+  };
+}

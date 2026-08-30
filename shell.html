@@ -126,6 +126,8 @@ h4{margin:0;font-family:var(--cond);font-size:9.5px;font-weight:600;
 #tVuelo:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
 #consolaTiempo{padding:12px 14px;display:flex;flex-direction:column;gap:9px;width:100%}
 .reloj{display:flex;align-items:baseline;gap:9px}
+#avisoRango{display:none;font-family:var(--cond);font-size:10px;line-height:1.4;
+  color:var(--solar);border-left:1px solid rgba(232,177,92,.5);padding-left:7px;cursor:help}
 #fecha{font-family:var(--mono);font-size:17px;font-weight:500;letter-spacing:.01em;
   font-variant-numeric:tabular-nums;color:var(--solar)}
 #hora{font-family:var(--mono);font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -399,12 +401,14 @@ body.momento #instrumentos,body.momento #bloqueNave,body.momento #tVuelo{display
 #postalImg.lista{opacity:1}
 #postalCarga{position:absolute;font-family:var(--mono);font-size:10px;color:var(--muted);
   letter-spacing:.14em;text-transform:uppercase}
-#btnDescargarPostal,#btnVerComparar{background:rgba(255,91,65,.06);border:1px solid var(--signal);
+.filaBotones{display:flex;gap:8px}
+.filaBotones button{flex:1}
+#btnDescargarPostal,#btnCompartirPostal,#btnVerComparar{background:rgba(255,91,65,.06);border:1px solid var(--signal);
   color:var(--signal);font-family:var(--cond);font-size:12px;font-weight:500;
   letter-spacing:.16em;text-transform:uppercase;padding:10px;cursor:pointer;transition:.14s}
-#btnDescargarPostal:hover,#btnVerComparar:hover{background:rgba(255,91,65,.15)}
-#btnDescargarPostal:focus-visible,#btnVerComparar:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
-#btnDescargarPostal[disabled],#btnVerComparar[disabled]{opacity:.45;cursor:default}
+#btnDescargarPostal:hover,#btnCompartirPostal:hover,#btnVerComparar:hover{background:rgba(255,91,65,.15)}
+#btnDescargarPostal:focus-visible,#btnCompartirPostal:focus-visible,#btnVerComparar:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
+#btnDescargarPostal[disabled],#btnCompartirPostal[disabled],#btnVerComparar[disabled]{opacity:.45;cursor:default}
 
 /* --- comparador --- */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
@@ -551,6 +555,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   </div>
   <footer id="consolaTiempo" class="panel">
     <div class="reloj"><span id="fecha">—</span><span id="hora">—</span></div>
+    <div id="avisoRango" title="Los elementos orbitales del JPL est&aacute;n ajustados para 1800&ndash;2050; fuera de ese rango las posiciones pierden precisi&oacute;n gradualmente (y los cometas, m&aacute;s r&aacute;pido).">Precisi&oacute;n reducida &middot; fuera de 1800&ndash;2050</div>
     <div class="transporte">
       <button class="tb" id="btnMenos" title="Más lento">&#9664;&#9664;</button>
       <button class="tb" id="btnPlay" title="Pausa / continuar">&#10073;&#10073;</button>
@@ -611,6 +616,8 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
     <div class="panel bloque cerrado">
       <h4>Compartir</h4>
       <button id="btnCompartir" class="ancho2">Copiar enlace a esta vista</button>
+      <button id="btnCaptura" class="ancho2">Capturar esta vista (PNG)</button>
+      <button id="btnCompartirVista" class="ancho2">Compartir esta vista&hellip;</button>
       <button id="btnPostal2" class="ancho2">Postal de esta fecha</button>
     </div>
 
@@ -678,7 +685,10 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
       <img id="postalImg" alt="Vista previa de la postal">
       <span id="postalCarga">componiendo&hellip;</span>
     </div>
-    <button id="btnDescargarPostal">Descargar PNG</button>
+    <div class="filaBotones">
+      <button id="btnDescargarPostal">Descargar PNG</button>
+      <button id="btnCompartirPostal">Compartir&hellip;</button>
+    </div>
     <p class="notaPostal">El sistema visto desde el norte de la ecl&iacute;ptica, con las posiciones
       reales de la fecha del reloj y un detalle del sistema interior. La imagen se compone
       en tu navegador.</p>

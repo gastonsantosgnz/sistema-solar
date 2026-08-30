@@ -72,8 +72,17 @@ function proyectar(v){
   return { x:(_pv.x*0.5+0.5)*innerWidth, y:(-_pv.y*0.5+0.5)*innerHeight, z:_pv.z };
 }
 
+/* validez de los elementos del JPL: fuera de 1800–2050 se avisa */
+const JD_RANGO = [dateToJD(new Date(Date.UTC(1800, 0, 1))), dateToJD(new Date(Date.UTC(2050, 0, 1)))];
+let rangoPrev = null;
+
 let panelCuadros = 0;
 function actualizarHUD(){
+  const fueraRango = state.jd < JD_RANGO[0] || state.jd > JD_RANGO[1];
+  if (fueraRango !== rangoPrev){
+    rangoPrev = fueraRango;
+    $('#avisoRango').style.display = fueraRango ? 'block' : 'none';
+  }
   if (++panelCuadros >= 30){ panelCuadros = 0; actualizarPanel(); }
   const w = innerWidth, h = innerHeight;
 
