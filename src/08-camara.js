@@ -202,6 +202,8 @@ function renderCuadro(dt){
     c.uni.uTime.value = T;
     // nivel de detalle procedural según el tamaño en pantalla
     c.uni.uDetail.value = Math.min(1, Math.max(0, (rEf/dist) * 900));
+    // grano de cercanía: despierta cuando el cuerpo llena la pantalla
+    c.uni.uCerca.value = Math.min(1, Math.max(0, ((rEf/dist) - 0.35) / 0.4));
 
     if (c.ring){
       c.runi.uLight.value = c.uni.uLight.value;
@@ -334,6 +336,7 @@ function renderCuadro(dt){
   renderer.clear();
   renderer.render(sky.scene, skyCam);
   renderer.render(scene, camera);
+  renderAtmosfera();                           // velo de cielo si volamos bajo
   if (state.mode === 'free') renderNave(dt);   // pase overlay: el vehículo, si hay
 }
 

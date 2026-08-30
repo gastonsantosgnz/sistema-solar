@@ -119,60 +119,75 @@ function construirSonda(){
   const fx = toberaFX(0x9fc4ff, 0.07);       // propulsión iónica: azul
   fx.position.set(0, 0, 0.115);
   g.add(fx);
-  g.scale.setScalar(0.8);
-  return { grupo: g, toberas: [fx], escala: 0.8 };
+  g.scale.setScalar(0.4);
+  return { grupo: g, toberas: [fx], escala: 0.4 };
 }
 
-/* ---------- la nave: aluminio claro, alas en flecha, luces de navegación ---------- */
+/* ---------- la nave: punta de flecha facetada con alas-cuchilla ---------- */
 function construirNave(){
   const g = new THREE.Group();
-  const casco = matPho(0xccd1d9, 30),        // aluminio claro: destaca sobre el vacío
-        panelC = matLam(0x99a0ac),
-        acento = matLam(0xff5b41),
+  const casco = new THREE.MeshPhongMaterial({ color: 0xccd1d9, shininess: 26, flatShading: true });
+  const cascoAla = new THREE.MeshPhongMaterial({ color: 0xbfc5cd, shininess: 22, flatShading: true, side: THREE.DoubleSide });
+  const panelC = new THREE.MeshPhongMaterial({ color: 0x8f96a3, shininess: 16, flatShading: true });
+  const acento = matLam(0xff5b41),
         metal = matPho(0x5a6172, 45),
         vidrio = matPho(0x101823, 95),
         oscuro = matLam(0x2e3440);
 
-  const perfil = [
-    new THREE.Vector2(0.001, -0.50),
-    new THREE.Vector2(0.050, -0.26),
-    new THREE.Vector2(0.072, 0.02),
-    new THREE.Vector2(0.050, 0.34),
-    new THREE.Vector2(0.001, 0.46)
-  ];
-  const fus = new THREE.LatheGeometry(perfil, 22);
-  fus.rotateX(Math.PI / 2);                  // la nariz (y+) apunta a -z
-  pieza(g, fus, casco);
+  // casco: dos pirámides de base compartida — punta de flecha facetada
+  const proaGeo = new THREE.ConeGeometry(0.17, 0.62, 4);
+  proaGeo.rotateX(-Math.PI / 2);
+  const proa = pieza(g, proaGeo, casco, 0, 0, -0.31);
+  proa.scale.set(1.5, 0.42, 1);
+  const popaGeo = new THREE.ConeGeometry(0.17, 0.40, 4);
+  popaGeo.rotateX(Math.PI / 2);
+  const popa = pieza(g, popaGeo, casco, 0, 0, 0.20);
+  popa.scale.set(1.5, 0.42, 1);
 
-  // cabina y espina dorsal
-  const cab = pieza(g, new THREE.SphereGeometry(0.045, 14, 10), vidrio, 0, 0.048, -0.14);
-  cab.scale.set(1, 0.55, 1.5);
-  pieza(g, new THREE.BoxGeometry(0.016, 0.012, 0.46), panelC, 0, 0.058, 0.12);
+  // cabina alargada encajada en el lomo
+  const cab = pieza(g, new THREE.SphereGeometry(0.05, 12, 8), vidrio, 0, 0.05, -0.12);
+  cab.scale.set(0.8, 0.55, 2.1);
 
-  // franjas laterales de acento a lo largo del fuselaje
+  // librea: espina dorsal y cheurones de acento sobre las facetas de la nariz
+  pieza(g, new THREE.BoxGeometry(0.013, 0.016, 0.5), acento, 0, 0.045, 0.06);
   for (const s of [1, -1])
-    pieza(g, new THREE.BoxGeometry(0.006, 0.02, 0.5), acento, s * 0.066, 0, 0.06);
+    pieza(g, new THREE.BoxGeometry(0.15, 0.01, 0.05), acento, s * 0.09, 0.026, -0.36, 0, s * 0.5, s * 0.14);
 
-  // toberas de maniobra (RCS) junto a la nariz
-  for (const sx of [1, -1]) for (const sy of [1, -1])
-    pieza(g, new THREE.BoxGeometry(0.02, 0.016, 0.03), oscuro, sx * 0.042, sy * 0.036, -0.3);
-
-  // antena dorsal
-  pieza(g, new THREE.CylinderGeometry(0.0028, 0.0028, 0.09, 6), panelC, 0, 0.1, 0.03);
-  pieza(g, new THREE.SphereGeometry(0.007, 8, 6), acento, 0, 0.148, 0.03);
-
-  // alas en flecha claras, borde y winglets
+  // alas-cuchilla: trapecios extruidos, barridos hacia atrás, con muesca en la punta
+  const forma = new THREE.Shape();
+  forma.moveTo(0.10, -0.08);
+  forma.lineTo(0.56, 0.16);
+  forma.lineTo(0.65, 0.32);
+  forma.lineTo(0.50, 0.28);
+  forma.lineTo(0.13, 0.26);
+  forma.closePath();
+  const alaGeo = new THREE.ExtrudeGeometry(forma, { depth: 0.014, bevelEnabled: false });
+  alaGeo.rotateX(Math.PI / 2);
   for (const s of [1, -1]){
-    pieza(g, new THREE.BoxGeometry(0.4, 0.007, 0.15), casco, s * 0.21, -0.012, 0.17, 0, s * 0.48, s * 0.06);
-    pieza(g, new THREE.BoxGeometry(0.02, 0.009, 0.132), acento, s * 0.385, -0.012, 0.255, 0, s * 0.48, s * 0.06);
-    pieza(g, new THREE.BoxGeometry(0.006, 0.055, 0.1), panelC, s * 0.398, 0.018, 0.26, 0, s * 0.48, 0);
-    // motores gemelos con garganta oscura
-    pieza(g, new THREE.CylinderGeometry(0.03, 0.036, 0.16, 12), metal, s * 0.058, -0.006, 0.4, Math.PI / 2);
-    pieza(g, new THREE.CylinderGeometry(0.023, 0.03, 0.03, 12), oscuro, s * 0.058, -0.006, 0.472, Math.PI / 2);
+    const ala = new THREE.Mesh(alaGeo, cascoAla);
+    ala.position.set(0, 0.004, 0);
+    ala.scale.x = s;
+    ala.rotation.z = -s * 0.09;              // diedro leve
+    g.add(ala);
+    // filo de acento en el borde de ataque y aleta de punta
+    pieza(g, new THREE.BoxGeometry(0.34, 0.018, 0.016), acento, s * 0.33, -0.002, 0.045, 0, -s * 0.48, 0);
+    pieza(g, new THREE.BoxGeometry(0.006, 0.07, 0.12), panelC, s * 0.585, 0.02, 0.26, 0, 0, s * 0.12);
   }
-  // timón vertical
-  pieza(g, new THREE.BoxGeometry(0.007, 0.11, 0.13), casco, 0, 0.065, 0.37, -0.18);
-  pieza(g, new THREE.BoxGeometry(0.009, 0.03, 0.11), acento, 0, 0.115, 0.36, -0.18);
+
+  // toberas de maniobra (RCS) en las facetas de la nariz
+  for (const sx of [1, -1]) for (const sy of [1, -1])
+    pieza(g, new THREE.BoxGeometry(0.022, 0.014, 0.03), oscuro, sx * 0.06, sy * 0.024, -0.4);
+
+  // antena sobre el lomo
+  pieza(g, new THREE.CylinderGeometry(0.0028, 0.0028, 0.08, 6), panelC, 0, 0.08, 0.1);
+  pieza(g, new THREE.SphereGeometry(0.007, 8, 6), acento, 0, 0.124, 0.1);
+
+  // motores gemelos flanqueando la cola: garganta oscura y aro de admisión
+  for (const s of [1, -1]){
+    pieza(g, new THREE.CylinderGeometry(0.03, 0.036, 0.15, 12), metal, s * 0.085, -0.008, 0.35, Math.PI / 2);
+    pieza(g, new THREE.CylinderGeometry(0.023, 0.03, 0.03, 12), oscuro, s * 0.085, -0.008, 0.418, Math.PI / 2);
+    pieza(g, new THREE.TorusGeometry(0.031, 0.0035, 6, 20), acento, s * 0.085, -0.008, 0.278);
+  }
 
   // luces de navegación: rojo a babor, verde a estribor, blanca en la cola
   const luces = [];
@@ -181,23 +196,23 @@ function construirNave(){
       map: glowTex, color, transparent: true, opacity: 0.8,
       blending: THREE.AdditiveBlending, depthWrite: false
     }));
-    s.scale.setScalar(0.055);
+    s.scale.setScalar(0.05);
     s.position.set(x, y, z);
     g.add(s); luces.push(s);
     return s;
   };
-  foco(0xff5050, -0.385, -0.012, 0.255);
-  foco(0x46e08a,  0.385, -0.012, 0.255);
-  foco(0xfff2d0,  0, 0.125, 0.4);
+  foco(0xff5050, -0.6, 0.01, 0.3);
+  foco(0x46e08a,  0.6, 0.01, 0.3);
+  foco(0xfff2d0,  0, 0.02, 0.42);
 
   const toberas = [];
   for (const s of [1, -1]){
     const fx = toberaFX(0xffa15e, 0.06);     // química: naranja
-    fx.position.set(s * 0.058, -0.006, 0.485);
+    fx.position.set(s * 0.085, -0.008, 0.44);
     g.add(fx); toberas.push(fx);
   }
-  g.scale.setScalar(0.72);
-  return { grupo: g, toberas, luces, escala: 0.72 };
+  g.scale.setScalar(0.36);
+  return { grupo: g, toberas, luces, escala: 0.36 };
 }
 
 const VEHICULOS = { sonda: construirSonda, nave: construirNave };

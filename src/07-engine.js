@@ -138,7 +138,7 @@ function crearCuerpo(def, esLuna){
     uSunDir:{value:V3(1,0,0)}, uSunObj:{value:V3(1,0,0)},
     uCA:{value:P[0]}, uCB:{value:P[1]}, uCC:{value:P[2]},
     uLight:{value:1}, uTime:{value:0}, uAmb:{value:0.022},
-    uRing:{value:new THREE.Vector2(0,0)}, uDetail:{value:1},
+    uRing:{value:new THREE.Vector2(0,0)}, uDetail:{value:1}, uCerca:{value:0},
     uGanancia:{value: GANANCIA[def.id] || 1},
     uEje:{value: V3(0,0,1)},
     uNumCast:{value:0},
@@ -206,7 +206,8 @@ function crearCuerpo(def, esLuna){
 
   /* nubes terrestres */
   if (def.id === 'tierra'){
-    const cuni = { uSunDir:uni.uSunDir, uLight:uni.uLight, uNubes:{ value: cargarTex('tierra_nubes') } };
+    const cuni = { uSunDir:uni.uSunDir, uLight:uni.uLight, uCerca:uni.uCerca,
+                   uNubes:{ value: cargarTex('tierra_nubes') } };
     const nub = new THREE.Mesh(esferaGeo, new THREE.ShaderMaterial({
       uniforms:cuni, vertexShader:PLANET_VERT, fragmentShader:CLOUD_FRAG,
       transparent:true, depthWrite:false

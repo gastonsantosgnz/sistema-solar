@@ -18,6 +18,11 @@ explica qué estás viendo hasta que sales. Como toda la vista es estado de la U
 cada momento se comparte como un enlace. El reloj, además, corre en ambos sentidos:
 la escalera de velocidades llega hasta −10 años/s.
 
+Al descender sobre un cuerpo con atmósfera (Tierra, Venus, Marte, Titán) un velo
+de dispersión pinta el cielo: azul y bruma de horizonte de día, banda cálida de
+crepúsculo hacia el Sol, transparente y estrellado de noche. De cerca, nubes y
+suelo se enriquecen con detalle procedural anclado a la superficie.
+
 El **vuelo libre** lleva instrumentos: velocímetro de cinta logarítmica con hitos
 reales por el camino (del sonido a la Voyager, la sonda Parker, la luz y miles de
 veces más allá), velocidad de crucero fijable con un clic en cualquier hito, una

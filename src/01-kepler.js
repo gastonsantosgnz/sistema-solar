@@ -8,17 +8,23 @@ function jdToDate(jd){ return new Date((jd - 2440587.5) * 86400000); }
 
 function norm360(x){ x = x % 360; return x < 0 ? x + 360 : x; }
 
-// Resuelve la ecuación de Kepler M = E - e·sin(E) (M, E en grados)
+// Resuelve la ecuación de Kepler M = E - e·sin(E) (M, E en grados).
+// Newton acotado por bisección: f es monótona, así que el resultado está
+// garantizado incluso con e ~ 1 (cometas casi parabólicos como Hale-Bopp),
+// donde el Newton simple diverge y hacía vibrar la posición.
 function solveKepler(M, e){
-  const eStar = 180 / Math.PI * e;
-  let E = M + eStar * Math.sin(M * DEG);
-  for (let i = 0; i < 12; i++){
-    const dM = M - (E - eStar * Math.sin(E * DEG));
-    const dE = dM / (1 - e * Math.cos(E * DEG));
-    E += dE;
-    if (Math.abs(dE) < 1e-9) break;
+  const Mr = M * DEG;
+  let lo = Mr - e, hi = Mr + e;
+  let E = Mr + e * Math.sin(Mr);
+  if (E <= lo || E >= hi) E = (lo + hi) / 2;
+  for (let i = 0; i < 40; i++){
+    const f = E - e * Math.sin(E) - Mr;
+    if (Math.abs(f) < 1e-12) break;
+    if (f > 0) hi = E; else lo = E;
+    E -= f / (1 - e * Math.cos(E));
+    if (E <= lo || E >= hi) E = (lo + hi) / 2;   // Newton se salió del corchete: bisecar
   }
-  return E;
+  return E / DEG;
 }
 
 /* Posición heliocéntrica en el plano de la eclíptica J2000, en km.

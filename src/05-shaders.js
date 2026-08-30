@@ -76,6 +76,7 @@ uniform float uSunRad;
 varying vec3 vObj; varying vec3 vNrm; varying vec3 vWorld; varying vec2 vUv;
 #ifdef TEX
 uniform sampler2D uMapa;
+uniform float uCerca;    // 0..1: el cuerpo llena la pantalla
 #endif
 #ifdef TEX_TIERRA
 uniform sampler2D uNoche; uniform sampler2D uAgua; uniform sampler2D uRelieve;
@@ -165,6 +166,14 @@ void main(){
       N = normalize(este*nm.x + norte*nm.y + N*max(nm.z, 0.25));
     }
   #endif
+  /* De muy cerca, grano procedural anclado a la superficie: rompe el
+     pixelado de la textura magnificada sin inventar geografía.        */
+  if (uCerca > 0.001){
+    float g1 = fbm(P*90.0, 3, 2.1, 0.55);
+    float g2 = fbm(P*380.0, 3, 2.2, 0.5);
+    float k = uCerca * (0.55 + 0.45*tierraFirme);
+    col *= 1.0 + ((g1 - 0.5)*0.22 + (g2 - 0.5)*0.16) * k;
+  }
 
 #elif defined(SUN)
   float gran = fbm(P*26.0 + vec3(uTime*0.35), 4, 2.1, 0.55);
@@ -384,20 +393,28 @@ void main(){
 }`;
 
 /* ---------- nubes terrestres (mapa real, deriva lenta) ---------- */
-const CLOUD_FRAG = `
+const CLOUD_FRAG = GLSL_NOISE + `
 uniform sampler2D uNubes;
-uniform vec3 uSunDir; uniform float uLight;
-varying vec3 vNrm; varying vec3 vWorld; varying vec2 vUv;
+uniform vec3 uSunDir; uniform float uLight; uniform float uCerca;
+varying vec3 vNrm; varying vec3 vWorld; varying vec2 vUv; varying vec3 vObj;
 #include <common>
 #include <logdepthbuf_pars_fragment>
 void main(){
   float a = texture2D(uNubes, vUv).r;
+  float det = 0.5;
+  /* de cerca, la textura magnificada se erosiona con ruido fractal anclado
+     a la capa de nubes: bordes vaporosos en vez de manchas borrosas */
+  if (uCerca > 0.001){
+    det = fbm(vObj*150.0, 4, 2.2, 0.55);
+    a += (det - 0.5) * 0.6 * uCerca * smoothstep(0.02, 0.45, a);
+  }
   a = smoothstep(0.05, 0.62, a);
   if(a < 0.004) discard;
   vec3 N = normalize(vNrm);
   float lam = smoothstep(-0.09, 0.20, dot(N, uSunDir));
   float ndv = max(dot(N, normalize(-vWorld)), 0.0);
-  gl_FragColor = vec4(vec3(1.0, 0.995, 0.985) * (0.045 + lam * uLight * (0.72 + 0.28*ndv)), a * 0.94);
+  float tono = 1.0 + (det - 0.5) * 0.3 * uCerca;   // sombras internas de la nube, de cerca
+  gl_FragColor = vec4(vec3(1.0, 0.995, 0.985) * (0.045 + lam * uLight * (0.72 + 0.28*ndv)) * tono, a * 0.94);
   #include <logdepthbuf_fragment>
 }`;
 

@@ -48,6 +48,7 @@ const velInfo = () => (iVel < 0 ? '−' : '') + VELOCIDADES[Math.abs(iVel)].t;
 
 /* ---------- etiquetas ---------- */
 const etqs = {};
+const etqT = {};   // memoria de visibilidad por etiqueta, para espaciar los cambios
 for (const c of cuerpos){
   const e = document.createElement('button');
   e.className = 'etq' + (c.esLuna ? ' luna' : '') + (c.def.id === 'sol' ? ' sol' : '');
@@ -86,7 +87,10 @@ function actualizarHUD(){
     const p = proyectar(c.rel);
     const dentro = p.z > -1 && p.z < 1 && p.x > 4 && p.x < w - 8 && p.y > 8 && p.y < h - 8;
     let umbral = true;
-    if (c.esLuna) umbral = porId[c.def.padre].dist < c.def.a * 130 && c.pxRad > 0.35;
+    if (c.esLuna){
+      const vis = e.style.display !== 'none';
+      umbral = porId[c.def.padre].dist < c.def.a * (vis ? 150 : 130) && c.pxRad > (vis ? 0.27 : 0.35);
+    }
     if (c.def.el && !state.verAsteroides && c.def.id !== state.focus) umbral = false;
     if (c.def.sonda && (!state.verSondas || !c.lanzada)) umbral = false;
     if (!dentro || !umbral){ e.style.display = 'none'; continue; }
@@ -100,27 +104,40 @@ function actualizarHUD(){
   candidatos.sort((a, b) => {
     const d = rango(a.c) - rango(b.c);
     if (d !== 0) return d;
+    // histéresis de prioridad: la etiqueta que ya estaba puesta conserva su lugar
+    const v = (b.e.style.display !== 'none') - (a.e.style.display !== 'none');
+    if (v !== 0) return v;
     if (Math.abs(a.c.pxRad - b.c.pxRad) > 0.5) return b.c.pxRad - a.c.pxRad;
     return b.c.def.r - a.c.def.r;          // a igual tamaño en pantalla, el cuerpo mayor
   });
 
   // cuerpos suficientemente grandes en pantalla como para tapar a otros
   const tapan = candidatos.filter(x => x.c.pxRad > 3);
-  const oculto = (c, p) => tapan.some(t =>
+  const oculto = (c, p, vis) => tapan.some(t =>
     t.c !== c && t.c.dist < c.dist &&
-    Math.hypot(p.x - t.p.x, p.y - t.p.y) < t.c.pxRad * 0.94);
+    Math.hypot(p.x - t.p.x, p.y - t.p.y) < t.c.pxRad * (vis ? 0.86 : 1.0));
 
   const puestas = [];
+  const ahoraMs = performance.now();
   for (const { c, e, p } of candidatos){
-    if (c.def.id !== state.focus && oculto(c, p)){ e.style.display = 'none'; continue; }
+    const est = etqT[c.def.id] ||
+      (etqT[c.def.id] = { v: e.style.display !== 'none', t: -1e9, j: Math.random() * 260 });
+    let quiere = !(c.def.id !== state.focus && oculto(c, p, est.v));
     const off = Math.max(7, Math.min(c.pxRad + 8, 260));
     const anchoTxt = c.def.nombre.length * (c.esLuna ? 6.2 : 7.4) + off + 14;
     const haciaIzq = p.x + anchoTxt > w - 10 && p.x - anchoTxt > 8;
     const caja = haciaIzq
       ? { x1: p.x - anchoTxt, y1: p.y - 11, x2: p.x + 4, y2: p.y + 11 }
       : { x1: p.x - 4, y1: p.y - 11, x2: p.x + anchoTxt, y2: p.y + 11 };
-    const choca = puestas.some(q => !(caja.x2 < q.x1 || caja.x1 > q.x2 || caja.y2 < q.y1 || caja.y1 > q.y2));
-    if (choca){ e.style.display = 'none'; continue; }
+    if (quiere){
+      // histéresis ancha: a la etiqueta puesta le cuesta salir, a la nueva le cuesta entrar
+      const m = est.v ? 6.5 : -6.5;
+      quiere = !puestas.some(q => !(caja.x2 - m < q.x1 || caja.x1 + m > q.x2 || caja.y2 - m < q.y1 || caja.y1 + m > q.y2));
+    }
+    // debounce desincronizado: aparecer cuesta más que salir, y cada etiqueta a su ritmo
+    if (quiere !== est.v && ahoraMs - est.t < (quiere ? 780 : 480) + est.j) quiere = est.v;
+    if (quiere !== (est.v)){ est.v = quiere; est.t = ahoraMs; }
+    if (!quiere){ e.style.display = 'none'; continue; }
     puestas.push(caja);
     e.style.display = 'flex';
     const izq = haciaIzq;
@@ -136,7 +153,13 @@ function actualizarHUD(){
     const p = proyectar(V3(s.dir.x*1e9, s.dir.y*1e9, s.dir.z*1e9));
     if (p.z > 1 || p.z < -1 || p.x < 40 || p.x > w - 40 || p.y < 20 || p.y > h - 20){ el.style.display='none'; continue; }
     const caja = { x1:p.x-4, y1:p.y-9, x2:p.x + s.label.length*6.4 + 8, y2:p.y+9 };
-    if (puestas.some(q => !(caja.x2<q.x1||caja.x1>q.x2||caja.y2<q.y1||caja.y1>q.y2))){ el.style.display='none'; continue; }
+    const est = etqT['*' + s.label] ||
+      (etqT['*' + s.label] = { v: el.style.display !== 'none', t: -1e9, j: Math.random() * 260 });
+    const m = est.v ? 5 : -5;
+    let quiere = !puestas.some(q => !(caja.x2-m<q.x1||caja.x1+m>q.x2||caja.y2-m<q.y1||caja.y1+m>q.y2));
+    if (quiere !== est.v && ahoraMs - est.t < (quiere ? 700 : 450) + est.j) quiere = est.v;
+    if (quiere !== est.v){ est.v = quiere; est.t = ahoraMs; }
+    if (!quiere){ el.style.display='none'; continue; }
     puestas.push(caja);
     el.style.display = 'flex';
     el.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`;
