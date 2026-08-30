@@ -46,6 +46,7 @@ const state = {
   verTrans: true,
   verSondas: true,
   viaje: null,
+  comparando: false,
   chrome: true
 };
 

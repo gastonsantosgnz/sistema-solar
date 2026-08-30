@@ -4,6 +4,13 @@ Simulador 3D del sistema solar con distancias reales, efemérides del JPL y un c
 de 8 920 estrellas colocadas a su distancia verdadera. Funciona sin red: todo va
 incrustado en un solo archivo.
 
+Además del simulador trae una **postal descargable** —la vista cenital del sistema
+en cualquier fecha, compuesta en el navegador en 16:9, 9:16 o 1:1, con fase lunar y
+dedicatoria opcional— y un **comparador de tamaños** que pone hasta diez cuerpos
+lado a lado a escala real, alineados por la base, con su inclinación axial y
+rotando; el Sol entra completo a la fila. Ambos reutilizan el motor: no añaden
+assets ni peso al archivo.
+
 ## Compilar
 
 ```bash
@@ -113,7 +120,7 @@ La dirección refleja la vista y se puede restaurar:
 | `esc` | Exageración del tamaño de los cuerpos (1–1000) |
 | `vel` | Índice de velocidad del tiempo (0–8) |
 | `play` | `0` para empezar en pausa |
-| `capas` | Lista separada por comas; el prefijo `-` apaga (`c,-o` = constelaciones sí, órbitas no) |
+| `capas` | Lista separada por comas; el prefijo `-` apaga (`c,-o` = constelaciones sí, órbitas no). Letras: `o` órbitas · `e` etiquetas · `m` lunas · `a` asteroides · `k` cinturón de Kuiper · `c` constelaciones · `g` Vía Láctea · `z` luz real |
 
 ## Fuentes de datos
 

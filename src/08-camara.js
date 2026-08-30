@@ -117,6 +117,8 @@ function paso(ahora){
   fpsAcc += dt; fpsN++;
   if (fpsAcc > 0.5){ fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
 
+  if (state.comparando){ renderComparar(dt); return; }   // el estudio toma la pantalla
+
   if (state.viaje){
     /* viaje en el tiempo: el reloj barre de una fecha a otra con easing,
        y los planetas recorren sus órbitas reales por el camino          */

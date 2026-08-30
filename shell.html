@@ -252,11 +252,11 @@ input[type=range]:focus-visible{outline:1px solid var(--signal);outline-offset:3
   color:var(--muted);font-family:var(--mono);font-size:16px;cursor:pointer;padding:4px}
 #cerrarAyuda:hover{color:var(--signal)}
 
-/* --- postal --- */
-#postal{position:fixed;inset:0;z-index:41;background:rgba(3,4,7,.86);
+/* --- postal y selector del comparador --- */
+#postal,#comparar{position:fixed;inset:0;z-index:41;background:rgba(3,4,7,.86);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   display:none;place-items:center;padding:20px}
-#postal.abierto{display:grid}
+#postal.abierto,#comparar.abierto{display:grid}
 .cuadroPostal{width:min(440px,100%);background:var(--panel-solido);
   border:1px solid var(--rule-alta);padding:24px 26px 20px;position:relative;
   max-height:94vh;overflow-y:auto;display:flex;flex-direction:column;gap:13px;
@@ -269,9 +269,9 @@ input[type=range]:focus-visible{outline:1px solid var(--signal);outline-offset:3
   text-transform:uppercase;color:var(--signal)}
 .cuadroPostal h2{font-family:var(--serif);font-weight:400;font-size:24px;margin:-6px 0 0;
   letter-spacing:-.01em}
-#cerrarPostal{position:absolute;top:12px;right:14px;background:transparent;border:0;
+#cerrarPostal,#cerrarSelComp{position:absolute;top:12px;right:14px;background:transparent;border:0;
   color:var(--muted);font-family:var(--mono);font-size:16px;cursor:pointer;padding:4px;z-index:1}
-#cerrarPostal:hover{color:var(--signal)}
+#cerrarPostal:hover,#cerrarSelComp:hover{color:var(--signal)}
 .formatos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .fmt{display:flex;align-items:center;gap:9px;background:transparent;
   border:1px solid var(--rule);padding:9px 10px;cursor:pointer;color:var(--muted);
@@ -297,12 +297,67 @@ input[type=range]:focus-visible{outline:1px solid var(--signal);outline-offset:3
 #postalImg.lista{opacity:1}
 #postalCarga{position:absolute;font-family:var(--mono);font-size:10px;color:var(--muted);
   letter-spacing:.14em;text-transform:uppercase}
-#btnDescargarPostal{background:rgba(255,91,65,.06);border:1px solid var(--signal);
+#btnDescargarPostal,#btnVerComparar{background:rgba(255,91,65,.06);border:1px solid var(--signal);
   color:var(--signal);font-family:var(--cond);font-size:12px;font-weight:500;
   letter-spacing:.16em;text-transform:uppercase;padding:10px;cursor:pointer;transition:.14s}
-#btnDescargarPostal:hover{background:rgba(255,91,65,.15)}
-#btnDescargarPostal:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
-#btnDescargarPostal[disabled]{opacity:.45;cursor:default}
+#btnDescargarPostal:hover,#btnVerComparar:hover{background:rgba(255,91,65,.15)}
+#btnDescargarPostal:focus-visible,#btnVerComparar:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
+#btnDescargarPostal[disabled],#btnVerComparar[disabled]{opacity:.45;cursor:default}
+
+/* --- comparador --- */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--rule-alta);background:transparent;color:var(--ink-2);
+  font-family:var(--cond);font-size:10.5px;letter-spacing:.06em;padding:4px 9px;
+  cursor:pointer;text-transform:uppercase;transition:.14s}
+.chip:hover{border-color:var(--signal);color:var(--signal)}
+#compLista{max-height:42vh;overflow-y:auto;display:flex;flex-direction:column;gap:11px;
+  scrollbar-width:thin;scrollbar-color:var(--rule-alta) transparent;padding-right:3px}
+.cgrupo{display:grid;grid-template-columns:1fr 1fr;gap:1px 16px}
+.cgrupo h4{grid-column:1/-1;margin-bottom:3px}
+.crow{display:flex;align-items:center;gap:7px;font-family:var(--cond);font-size:12px;
+  color:var(--ink-2);padding:2.5px 3px;cursor:pointer}
+.crow:hover{background:rgba(255,255,255,.045)}
+.crow input{accent-color:var(--signal);width:12px;height:12px;flex:none;margin:0}
+.crow i{width:6px;height:6px;border-radius:50%;flex:none;opacity:.85}
+.crow em{font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted);margin-left:auto}
+#compVista{position:fixed;inset:0;z-index:28;display:none;pointer-events:none}
+body.comparando #compVista{display:block}
+body.comparando #hud,body.comparando #etiquetas,body.comparando #reticula{display:none!important}
+#compCab{position:absolute;top:14px;left:14px;padding:14px 16px;max-width:310px}
+#compTipo{font-family:var(--cond);font-size:9.5px;font-weight:600;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--signal);margin-bottom:5px}
+#compNombre{font-family:var(--serif);font-size:24px;font-weight:400;margin:0 0 8px;line-height:1.1}
+#compPista{margin:0;font-family:var(--cond);font-size:10px;line-height:1.5;color:var(--muted)}
+#cerrarComp{position:absolute;top:14px;right:14px;width:36px;height:36px;pointer-events:auto;
+  background:var(--panel);border:1px solid var(--rule-alta);color:var(--ink-2);
+  font-family:var(--mono);font-size:15px;cursor:pointer;transition:.14s;
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+#cerrarComp:hover{border-color:var(--signal);color:var(--signal)}
+#compIzq,#compDer{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:58px;
+  pointer-events:auto;background:var(--panel);border:1px solid var(--rule-alta);color:var(--ink-2);
+  font-family:var(--serif);font-size:20px;cursor:pointer;transition:.14s;
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+#compIzq{left:14px}
+#compDer{right:14px}
+#compIzq:hover,#compDer:hover{border-color:var(--signal);color:var(--signal)}
+#compEtq{position:absolute;inset:0;overflow:hidden}
+.cetq{position:absolute;top:0;left:0;text-align:center;white-space:nowrap;will-change:transform;
+  pointer-events:auto;cursor:pointer}
+.cetq:hover b{color:#fff}
+.cetq.activo b{color:var(--signal)}
+.cetq b{display:block;font-family:var(--cond);font-weight:500;font-size:11px;letter-spacing:.13em;
+  text-transform:uppercase;color:rgba(226,232,240,.8);text-shadow:0 1px 4px rgba(0,0,0,.9)}
+.cetq em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+#compDato{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  padding:8px 16px;font-family:var(--mono);font-size:11px;color:var(--solar);
+  font-variant-numeric:tabular-nums;max-width:calc(100vw - 28px);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:720px){
+  #compCab{max-width:calc(100vw - 70px);padding:10px 12px}
+  #compNombre{font-size:18px;margin-bottom:0}
+  #compPista{display:none}
+  .cgrupo{grid-template-columns:1fr}
+}
 .notaPostal{margin:0;font-family:var(--cond);font-size:10px;line-height:1.5;color:var(--muted)}
 
 #btnMenu,#mandos{display:none}
@@ -394,6 +449,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   <aside id="lateral">
     <nav id="indice" class="panel bloque">
       <button id="btnSistema" class="ancho">Ver todo el sistema</button>
+      <button id="btnComparar" class="ancho">Comparar tama&ntilde;os</button>
     </nav>
 
     <div class="panel bloque">
@@ -492,6 +548,33 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   </div>
 </div>
 
+<div id="comparar" role="dialog" aria-modal="true" aria-labelledby="compTituloSel">
+  <div class="cuadroPostal">
+    <button id="cerrarSelComp" class="cerrarX" aria-label="Cerrar">&times;</button>
+    <div class="sub">Comparador &middot; escala real</div>
+    <h2 id="compTituloSel">Comparar tama&ntilde;os</h2>
+    <div class="chips" id="compChips"></div>
+    <div id="compLista"></div>
+    <button id="btnVerComparar" disabled>Comparar (0)</button>
+    <p class="notaPostal">Elige de 2 a 10 cuerpos. Se muestran lado a lado a escala real,
+      alineados por la base, con su inclinaci&oacute;n axial verdadera y rotando despacio.</p>
+  </div>
+</div>
+
+<div id="compVista">
+  <div class="panel" id="compCab">
+    <div id="compTipo">Comparador &middot; escala real</div>
+    <h2 id="compNombre">&mdash;</h2>
+    <p id="compPista">&lsaquo; &rsaquo; o flechas: recorrer cuerpo a cuerpo &middot; rueda: acercar hacia el cursor &middot;
+      clic en un nombre: centrarlo &middot; 0: ver todo &middot; Esc: salir</p>
+  </div>
+  <button id="cerrarComp" aria-label="Cerrar comparador">&times;</button>
+  <button id="compIzq" aria-label="Cuerpo anterior">&lsaquo;</button>
+  <button id="compDer" aria-label="Cuerpo siguiente">&rsaquo;</button>
+  <div id="compEtq"></div>
+  <div class="panel" id="compDato"></div>
+</div>
+
 <div id="ayuda">
   <div class="cuadroAyuda">
     <button id="cerrarAyuda" aria-label="Cerrar">&times;</button>
@@ -504,7 +587,9 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
        eso solo cambia el tamaño de los cuerpos, nunca las distancias.</p>
     <p>Prueba <em>Ver todo el sistema</em> para asomarte desde 78 UA sobre el plano
        de la eclíptica, y <em>Salir del sistema</em> para plantarte junto a otra
-       estrella y mirar el Sol desde allí.</p>
+       estrella y mirar el Sol desde allí. Con <em>Comparar tamaños</em> pones hasta
+       diez cuerpos lado a lado a escala real, y el botón de imagen junto a
+       <em>hoy</em> descarga una postal del sistema en la fecha del reloj.</p>
     <div class="cols">
       <dl>
         <div class="l"><span>Girar alrededor del objetivo</span><kbd>arrastrar</kbd></div>

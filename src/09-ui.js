@@ -259,6 +259,7 @@ const punteros = new Map();
 let pellizco = 0;
 
 canvas.addEventListener('pointerdown', e => {
+  if (state.comparando) return;
   punteros.set(e.pointerId, { x:e.clientX, y:e.clientY });
   if (punteros.size === 2){ pellizco = sepPunteros(); arrastrando = false; return; }
   arrastrando = true; movido = 0; lx = e.clientX; ly = e.clientY;
@@ -269,6 +270,7 @@ function sepPunteros(){
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 canvas.addEventListener('pointermove', e => {
+  if (state.comparando) return;
   if (punteros.has(e.pointerId)) punteros.set(e.pointerId, { x:e.clientX, y:e.clientY });
   if (punteros.size === 2){
     const d = sepPunteros();
@@ -295,6 +297,7 @@ canvas.addEventListener('pointermove', e => {
   }
 });
 function soltar(e){
+  if (state.comparando) return;
   punteros.delete(e.pointerId);
   if (punteros.size < 2) pellizco = 0;
   if (!arrastrando) return;
@@ -305,6 +308,7 @@ canvas.addEventListener('pointerup', soltar);
 canvas.addEventListener('pointercancel', soltar);
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
+  if (state.comparando) return;
   const f = Math.exp(e.deltaY * 0.0011);
   if (state.mode === 'orbit'){
     state.distTarget = Math.max(radioEfectivo(porId[state.focus])*1.02 + 1,
@@ -334,6 +338,17 @@ addEventListener('keydown', e => {
   if ($('#postal').classList.contains('abierto')){
     if (k === 'escape') cerrarPostal();
     return;                       // con el modal abierto, los atajos no tocan la escena
+  }
+  if ($('#comparar').classList.contains('abierto')){
+    if (k === 'escape') cerrarSelector();
+    return;
+  }
+  if (state.comparando){
+    if (k === 'escape') cerrarComparar();
+    else if (k === 'arrowleft') pasoComp(-1);
+    else if (k === 'arrowright') pasoComp(1);
+    else if (k === '0' || k === 'home') resetComp();
+    return;
   }
   teclas[k] = true;
   if (e.shiftKey) teclas['shift'] = true;
