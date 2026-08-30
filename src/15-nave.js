@@ -212,6 +212,7 @@ document.querySelectorAll('#naveSeg button').forEach(b =>
 
 /* ---------- pase de render por cuadro ---------- */
 function renderNave(dt){
+  if (state.enMomento) return;               // los momentos son contemplación, sin cabina
   const id = state.vehiculo;
   if (!id || !VEHICULOS[id]) return;
   let rig = naveCache[id];
@@ -225,7 +226,10 @@ function renderNave(dt){
   // el morro reacciona con un pelo de retardo: sensación de masa
   navQ.slerp(camQ, 1 - Math.exp(-dt * 8));
   rig.grupo.quaternion.copy(navQ);
-  rig.grupo.position.copy(NAVE_OFF).applyQuaternion(camQ);
+  // con teleobjetivo (fov chico) la nave se aleja sin cambiar de tamaño:
+  // así conserva su proporción EN PANTALLA en vez de desbordar el encuadre
+  const kf = Math.tan(26 * DEG) / Math.tan(camera.fov * DEG / 2);
+  rig.grupo.position.copy(NAVE_OFF).multiplyScalar(kf).applyQuaternion(camQ);
 
   // luz desde el Sol real (el Sol vive en el origen)
   _nv.set(-state.camKm[0], -state.camKm[1], -state.camKm[2]).normalize();

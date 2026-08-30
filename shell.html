@@ -223,13 +223,13 @@ body.vuelo #bloqueNave{display:flex}
   text-transform:uppercase;padding:4px;cursor:pointer;transition:.14s;margin-top:3px}
 .ancho2:hover{border-color:var(--signal);color:var(--signal)}
 .ancho2:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
-#viajes{display:flex;flex-direction:column;gap:1px}
-#viajes button{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+#viajes,#momentos{display:flex;flex-direction:column;gap:1px}
+#viajes button,#momentos button{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
   background:transparent;border:0;padding:3px 4px;cursor:pointer;text-align:left;
   font-family:var(--cond);font-size:11.5px;color:var(--ink-2);transition:.12s}
-#viajes button:hover{color:var(--ink);background:rgba(255,255,255,.045)}
-#viajes button em{font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
-#viajes button:focus-visible{outline:1px solid var(--signal);outline-offset:-1px}
+#viajes button:hover,#momentos button:hover{color:var(--ink);background:rgba(255,255,255,.045)}
+#viajes button em,#momentos button em{font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
+#viajes button:focus-visible,#momentos button:focus-visible{outline:1px solid var(--signal);outline-offset:-1px}
 #indice button.ancho,#btnVolver{width:100%;background:transparent;border:1px solid var(--rule-alta);
   color:var(--ink-2);font-family:var(--cond);font-size:11px;letter-spacing:.1em;
   text-transform:uppercase;padding:5px;cursor:pointer;transition:.14s;margin-top:3px}
@@ -306,6 +306,27 @@ body.vuelo #instrumentos{display:flex}
   font-family:var(--serif);font-size:13px;line-height:1.5;color:var(--ink);
   opacity:0;transition:.45s ease;pointer-events:none;text-align:center}
 #aviso.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* --- banner de momento --- */
+#momBanner{position:absolute;left:50%;top:18px;transform:translateX(-50%) translateY(-12px);
+  width:min(600px,calc(100vw - 40px));padding:14px 40px 12px 18px;
+  background:var(--panel-solido);border:1px solid var(--rule-alta);
+  opacity:0;pointer-events:none;transition:.4s ease}
+#momBanner.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#momBanner b{display:block;font-family:var(--serif);font-weight:400;font-size:17px;
+  color:var(--ink);margin-bottom:4px}
+#momBanner p{margin:0;font-family:var(--serif);font-size:12.5px;line-height:1.55;
+  color:var(--ink-2)}
+#momBanner .momPie{display:block;margin-top:7px;font-family:var(--mono);font-size:9px;
+  letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+#momCerrar{position:absolute;top:8px;right:10px;background:transparent;border:0;
+  color:var(--muted);font-family:var(--mono);font-size:16px;cursor:pointer;padding:4px}
+#momCerrar:hover{color:var(--signal)}
+body.momento #instrumentos,body.momento #bloqueNave,body.momento #tVuelo{display:none!important}
+@media (max-width:720px){
+  #momBanner{top:auto;bottom:112px;font-size:12px}
+  #momBanner b{font-size:15px}
+}
 
 /* --- ayuda --- */
 #ayuda{position:fixed;inset:0;z-index:40;background:rgba(3,4,7,.86);
@@ -601,8 +622,8 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
 
     <div class="panel bloque cerrado">
       <h4>Momentos</h4>
-      <button id="btnPunto" class="ancho2">Punto azul pálido · 1990</button>
-      <p class="pie">Recrea la foto que tomó la Voyager 1 al mirar atrás desde 40 UA.</p>
+      <div id="momentos"></div>
+      <p class="pie">Escenas reales puestas en fecha y cámara. Cada una queda en la URL, lista para compartirse.</p>
     </div>
   </aside>
 
@@ -626,6 +647,13 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   </div>
 
   <div id="aviso"></div>
+
+  <div id="momBanner">
+    <button id="momCerrar" aria-label="Salir del momento">&times;</button>
+    <b id="momTitulo"></b>
+    <p id="momTexto"></p>
+    <span class="momPie">&times; o Esc para volver</span>
+  </div>
 
   <button id="btnMenu" aria-label="Mostrar controles"><i></i><i></i><i></i></button>
   <div id="mandos">

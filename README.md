@@ -11,6 +11,13 @@ lado a lado a escala real, alineados por la base, con su inclinación axial y
 rotando; el Sol entra completo a la fila. Ambos reutilizan el motor: no añaden
 assets ni peso al archivo.
 
+La sección **Momentos** guarda escenas curadas —el Punto azul pálido, la Voyager 2
+sobre Neptuno, la Gran Conjunción de 2020, el eclipse total de 2026, el regreso de
+Halley— cada una con su fecha, su cámara puesta con intención y un banner que
+explica qué estás viendo hasta que sales. Como toda la vista es estado de la URL,
+cada momento se comparte como un enlace. El reloj, además, corre en ambos sentidos:
+la escalera de velocidades llega hasta −10 años/s.
+
 El **vuelo libre** lleva instrumentos: velocímetro de cinta logarítmica con hitos
 reales por el camino (del sonido a la Voyager, la sonda Parker, la luz y miles de
 veces más allá), velocidad de crucero fijable con un clic en cualquier hito, una
@@ -126,7 +133,7 @@ La dirección refleja la vista y se puede restaurar:
 | `d` | Distancia de la cámara en km |
 | `yaw`, `pit` | Orientación de la cámara en grados |
 | `esc` | Exageración del tamaño de los cuerpos (1–1000) |
-| `vel` | Índice de velocidad del tiempo (0–8) |
+| `vel` | Velocidad del tiempo (−8 a 8; negativo = el reloj corre hacia atrás) |
 | `play` | `0` para empezar en pausa |
 | `nave` | Vehículo del vuelo libre: `sonda` (por defecto), `nave`, `0` = ninguno |
 | `capas` | Lista separada por comas; el prefijo `-` apaga (`c,-o` = constelaciones sí, órbitas no). Letras: `o` órbitas · `e` etiquetas · `m` lunas · `a` asteroides · `k` cinturón de Kuiper · `c` constelaciones · `g` Vía Láctea · `z` luz real |

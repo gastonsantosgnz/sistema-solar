@@ -15,7 +15,7 @@ function sincronizar(){
   $('#tVuelo').classList.toggle('on', state.mode === 'free');
   document.querySelectorAll('#naveSeg button').forEach(b =>
     b.classList.toggle('activo', (state.vehiculo || '0') === b.dataset.n));
-  $('#velTxt').textContent = state.playing ? VELOCIDADES[iVel].t : 'pausa';
+  $('#velTxt').textContent = state.playing ? velInfo() : 'pausa';
   $('#btnPlay').textContent = state.playing ? '❙❙' : '▶';
   document.body.classList.toggle('vuelo', state.mode === 'free');
   const s = state.sizeScale;
@@ -29,8 +29,8 @@ function sincronizar(){
 
 function montarControles(){
   $('#btnPlay').onclick = () => { state.playing = !state.playing; sincronizar(); };
-  $('#btnMas').onclick  = () => { iVel = Math.min(VELOCIDADES.length-1, iVel+1); aplicarVel(); };
-  $('#btnMenos').onclick= () => { iVel = Math.max(1, iVel-1); aplicarVel(); };
+  $('#btnMas').onclick  = () => { iVel = iVel === -1 ? 1 : Math.min(VELOCIDADES.length - 1, iVel + 1); aplicarVel(); };
+  $('#btnMenos').onclick= () => { iVel = iVel === 1 ? -1 : Math.max(-(VELOCIDADES.length - 1), iVel - 1); aplicarVel(); };
   $('#btnHoy').onclick  = () => { viajarEnElTiempo(dateToJD(new Date())); $('#fechaIn').value = new Date().toISOString().slice(0,10); };
 
   $('#fechaIn').value = jdToDate(state.jd).toISOString().slice(0,10);
@@ -69,7 +69,6 @@ function montarControles(){
   $('#btnVolver').onclick = () => { enfocar('tierra'); state.distTarget = encuadre(porId.tierra); };
   $('#btnSistema').onclick = () => { verSistema(); document.body.classList.remove('menu'); };
   $('#btnEventos').onclick = calculaEventos;
-  $('#btnPunto').onclick = puntoAzul;
 
   // secciones plegables del panel lateral
   document.querySelectorAll('#lateral .bloque').forEach(b => {
@@ -130,9 +129,6 @@ function puntoAzul(){
     camera.fov = 11;                       // teleobjetivo, como el de la sonda
     camera.updateProjectionMatrix();
     sincronizar(); actualizarPanel();
-    aviso('Est\u00e1s en la Voyager 1, a ' + nf(d/AU, 1) + ' UA de casa. Ese punto es la Tierra: '
-        + 'todo lo que existe para nosotros cabe en \u00e9l. La se\u00f1al de esta foto tard\u00f3 '
-        + tiempoLuz(d) + ' en llegar.');
   });
 }
 
@@ -189,7 +185,7 @@ function calculaEventos(){
   }, 30);
 }
 
-function irAEclipse(e){
+function irAEclipse(e, silencioso){
   state.sizeScale = 1; $('#escala').value = 0;
   state.verLunas = true;
   state.playing = false;
@@ -207,7 +203,7 @@ function irAEclipse(e){
     iVel = 2; state.rate = VELOCIDADES[2].v;   // 1 minuto por segundo
     state.playing = true;
     sincronizar(); actualizarPanel();
-    aviso(e.clase === 'solar'
+    if (!silencioso) aviso(e.clase === 'solar'
       ? `Eclipse ${e.tipo} de Sol: la sombra de la Luna est\u00e1 a punto de cruzar la Tierra. El reloj corre a 1 minuto por segundo.`
       : `Eclipse ${e.tipo} de Luna: la Luna entra en la sombra de la Tierra y se oscurece. El reloj corre a 1 minuto por segundo.`);
   });
@@ -253,7 +249,7 @@ requestAnimationFrame(paso);
 window.sistemaSolar = {
   state, porId, cuerpos, camera, renderer, sky, sincronizar, actualizarPanel,
   enfocar, viajarA, alternarModo, aviso, verSistema, viajarEnElTiempo, irAEclipse, puntoAzul,
-  velocidad(i){ iVel = Math.max(0, Math.min(VELOCIDADES.length-1, i)); aplicarVel(); },
+  velocidad(i){ iVel = Math.max(-(VELOCIDADES.length - 1), Math.min(VELOCIDADES.length - 1, i)) || 1; aplicarVel(); },
   escala(k){ state.sizeScale = k; $('#escala').value = Math.log10(k)/3*1000; sincronizar(); },
   distancia(km){ state.distTarget = state.dist = km; },
   fecha(iso){ state.jd = dateToJD(new Date(iso)); }

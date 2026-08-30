@@ -62,7 +62,13 @@ function aplicarURL(){
   if (q.get('yaw')) state.yaw = +q.get('yaw') * DEG;
   if (q.get('pit')) state.pitch = Math.max(-1.55, Math.min(1.55, +q.get('pit') * DEG));
   if (q.get('esc')){ const k = Math.max(1, Math.min(1000, +q.get('esc'))); state.sizeScale = k; $('#escala').value = Math.log10(k)/3*1000; }
-  if (q.get('vel')){ const i = +q.get('vel'); if (i >= 0 && i < VELOCIDADES.length){ iVel = i; state.rate = VELOCIDADES[i].v; } }
+  if (q.get('vel')){
+    const i = +q.get('vel');
+    if (Number.isInteger(i) && Math.abs(i) < VELOCIDADES.length){
+      iVel = i || 1;                                    // el 0 heredado equivale a pausa
+      state.rate = i === 0 ? 0 : (i < 0 ? -1 : 1) * VELOCIDADES[Math.abs(i)].v;
+    }
+  }
   if (q.get('play') === '0') state.playing = false;
   const nv = q.get('nave');
   if (nv !== null) state.vehiculo = nv === 'nave' ? 'nave' : nv === '0' ? null : 'sonda';

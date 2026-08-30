@@ -43,7 +43,8 @@ const VELOCIDADES = [
   { v:365.25,       t:'1 año/s' },
   { v:3652.5,       t:'10 años/s' }
 ];
-let iVel = 4;
+let iVel = 4;                 // con signo: negativo = el tiempo corre hacia atrás
+const velInfo = () => (iVel < 0 ? '−' : '') + VELOCIDADES[Math.abs(iVel)].t;
 
 /* ---------- etiquetas ---------- */
 const etqs = {};
@@ -155,7 +156,7 @@ function actualizarHUD(){
 
   $('#fecha').textContent = fechaTxt(state.jd);
   $('#hora').textContent  = horaTxt(state.jd);
-  $('#velTxt').textContent = state.playing ? VELOCIDADES[iVel].t : 'pausa';
+  $('#velTxt').textContent = state.playing ? velInfo() : 'pausa';
   $('#lecturaDist').textContent = distKm(c.dist - radioEfectivo(c));
   $('#fps').textContent = Math.round(fps);
   actualizarInstrumentos();
@@ -367,8 +368,8 @@ addEventListener('keydown', e => {
   if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
   if (k === ' '){ e.preventDefault(); state.playing = !state.playing; }
-  else if (k === ']'){ iVel = Math.min(VELOCIDADES.length-1, iVel+1); aplicarVel(); }
-  else if (k === '['){ iVel = Math.max(1, iVel-1); aplicarVel(); }
+  else if (k === ']'){ iVel = iVel === -1 ? 1 : Math.min(VELOCIDADES.length - 1, iVel + 1); aplicarVel(); }
+  else if (k === '['){ iVel = iVel === 1 ? -1 : Math.max(-(VELOCIDADES.length - 1), iVel - 1); aplicarVel(); }
   else if (k === 'l'){ state.verEtiquetas = !state.verEtiquetas; sincronizar(); }
   else if (k === 'o'){ state.verOrbitas = !state.verOrbitas; sincronizar(); }
   else if (k === 'c'){ state.verConstelaciones = !state.verConstelaciones; sincronizar(); }
@@ -381,7 +382,7 @@ addEventListener('keydown', e => {
   else if (k === 'v'){ alternarModo(); }
   else if (k === 'g'){ state.verViaLactea = !state.verViaLactea; sincronizar(); }
   else if (k === '?'){ $('#ayuda').classList.toggle('abierto'); }
-  else if (k === 'escape'){ $('#ayuda').classList.remove('abierto'); }
+  else if (k === 'escape'){ $('#ayuda').classList.remove('abierto'); cerrarMomento(); }
   else if (k >= '0' && k <= '9'){
     const orden = ['sol','mercurio','venus','tierra','marte','jupiter','saturno','urano','neptuno','pluton'];
     irACuerpo(orden[+k]);
@@ -395,6 +396,7 @@ addEventListener('keyup', e => {
 addEventListener('blur', () => { for (const k in teclas) teclas[k] = false; });
 
 function alternarModo(){
+  cerrarMomento();               // pilotar y contemplar no se mezclan
   if (state.mode === 'orbit'){
     state.mode = 'free';
     freeYaw = state.yaw + Math.PI/2; freePitch = -state.pitch; freeRoll = 0;
@@ -408,7 +410,7 @@ function alternarModo(){
 }
 
 function aplicarVel(){
-  state.rate = VELOCIDADES[iVel].v;
+  state.rate = (iVel < 0 ? -1 : 1) * VELOCIDADES[Math.abs(iVel)].v;
   state.playing = true;
   sincronizar();
 }
