@@ -1,5 +1,8 @@
 # Hoja de ruta
 
+**Estado (6 sep 2026)**: fases 1 a 5 completadas y en producción; quedan la 6
+(bilingüe) y la 7 (lanzamiento).
+
 Plan de implementación del backlog acordado. El orden no es el de la emoción sino
 el de las dependencias: primero lo pequeño que desbloquea (capturar → compartir),
 luego la infraestructura (PWA), luego las features grandes (sonido, galaxia,

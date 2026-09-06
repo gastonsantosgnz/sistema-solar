@@ -54,13 +54,21 @@ de navegación, dibujadas a escala de cabina —lo único del universo que no es
 escala real, y se declara. En el teléfono, un cockpit táctil: pulgar izquierdo
 empuja, pulgar derecho apunta.
 
-Y se puede **salir de la galaxia**: la Vía Láctea existe como objeto 3D —220 000
-puntos procedurales y deterministas con posición real, bulbo, brazos, regiones HII
-y halo, con el Sol a 8.2 kpc del centro en la orientación verdadera— y Andrómeda al
-fondo, a 765 kpc, con su inclinación real. Desde dentro se ve como la banda de
-siempre; al alejarse más de unos cientos de años luz, la banda pintada cede el paso
-a la espiral. No cuesta nada mientras no sales del sistema: se genera en un rato
-libre, solo se dibuja lejos del Sol y se recorta sola si los fps caen.
+Y se puede **salir del sistema**. Diez **sistemas con planetas** —Próxima Centauri,
+la estrella de Barnard, TRAPPIST-1 y sus siete mundos, 51 Pegasi, Kepler-186…— con
+sus estrellas en la posición real y dieciocho exoplanetas orbitando con sus periodos
+verdaderos e iluminados por su propia estrella; cada sistema es un destino con sus
+órbitas en cuadro. Ocho **nebulosas reales** (Orión, Carina, la Laguna, la Trífida,
+el Águila, la Roseta, las Pléyades, Norteamérica) en su sitio, a su distancia y con su
+tamaño, de forma y color procedurales. Y la **Vía Láctea como objeto 3D**: 240 000
+puntos procedurales y deterministas con posición real —bulbo con barra, disco viejo,
+brazos jóvenes con cúmulos y regiones HII, halo— y bandas de polvo que restan luz,
+con el Sol a 8.2 kpc del centro en la orientación verdadera, y Andrómeda al fondo a
+765 kpc con su inclinación real. Desde dentro, la banda de siempre; al alejarse más
+de unos cientos de años luz, la banda pintada cede el paso a la espiral. Nada de esto
+cuesta mientras no sales del sistema: se genera en un rato libre, solo se dibuja lejos
+del Sol y se recorta solo si los fps caen. Lejos del Sol, las etiquetas del sistema se
+retiran y queda una por sistema.
 
 El **sonido** es sintetizado y honesto, sin un solo archivo de audio: solo se oye
 el empuje de la propia nave (vibración estructural, siguiendo la rampa real) y la
@@ -104,7 +112,7 @@ una ruta relativa resolvería a `/fecha/tex/...` y daría 404. El prefijo sale d
 cada repo bajo `/<repo>/`), las rutas se generan con ese prefijo automáticamente.
 
 ```bash
-SITIO_URL=https://usuario.github.io/sistema-solar node build.mjs   # base /sistema-solar/
+SITIO_URL=https://usuario.github.io/universo-a-escala node build.mjs   # base /universo-a-escala/
 SITIO_URL=https://midominio.com node build.mjs                     # base /
 ```
 
@@ -203,6 +211,10 @@ La dirección refleja la vista y se puede restaurar:
 - Sondas: trayectorias reales del JPL Horizons, interpoladas con Catmull-Rom
 - Luna: teoría ELP truncada (Meeus, *Astronomical Algorithms*, cap. 47)
 - Estrellas: catálogo HYG v4.1, magnitud ≤ 6.5
+- Exoplanetas y sus estrellas: NASA Exoplanet Archive
+- Nebulosas: posición, distancia y tamaño de catálogo (Messier / NGC); forma procedural
+- Galaxia: modelo procedural con la orientación y las distancias reales (polo y centro
+  galácticos, Sol a 8.2 kpc); Andrómeda con su distancia, inclinación y ángulo de posición
 - Constelaciones: d3-celestial de Olaf Frohn (BSD-3)
 - Mapas de superficie: NASA Blue Marble y Visible Earth; Solar System Scope (CC BY 4.0)
 - Three.js r169 (MIT), incrustado
@@ -238,7 +250,12 @@ Si necesitas una licencia distinta para un uso comercial cerrado, escribe.
 - Las lunas salvo la Luna usan órbitas circulares, no keplerianas.
 - Los cometas se propagan como problema de dos cuerpos: lejos de su época los pasos por
   el perihelio se desvían (Halley da enero de 2062 frente a julio de 2061 real).
-- La Vía Láctea es procedural, no fotográfica.
+- La Vía Láctea es un modelo procedural, no un mapa estelar: orientación y distancias
+  reales, brazos y polvo verosímiles pero inventados.
+- Los exoplanetas orbitan en círculos coplanares (sus inclinaciones y excentricidades
+  se desconocen casi siempre); los radios sin tránsito van estimados y se marcan.
+- Las nebulosas tienen posición, tamaño y distancia reales; su forma y color son
+  procedurales.
 - Las texturas son de 2K: de muy cerca, el detalle de nubes y suelo es procedural,
   no geografía real.
 - La nave y la sonda se dibujan a escala de cabina, no a escala real.
