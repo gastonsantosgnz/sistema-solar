@@ -140,6 +140,12 @@ try { aplicarURL(); } catch (e) { /* una URL malformada nunca debe romper la app
 if (ES_SITIO){
   $('#enlaceExplorar').style.display = '';
   setInterval(escribirURL, 1000);
+  // PWA: instalable y disponible sin red (el service worker lo genera build.mjs)
+  if ('serviceWorker' in navigator){
+    const ambito = urlBase.endsWith('/') ? urlBase : urlBase.replace(/[^/]*$/, '');
+    addEventListener('load', () =>
+      navigator.serviceWorker.register(ambito + 'sw.js').catch(() => {}));
+  }
 } else {
   $('#btnCompartir').textContent = 'Copiar enlace a esta vista';
 }

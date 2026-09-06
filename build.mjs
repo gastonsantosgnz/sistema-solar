@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import { icono } from './iconos.mjs';
 
 const dir = new URL('.', import.meta.url).pathname;
 const R = p => fs.readFileSync(dir + p, 'utf8');
@@ -144,6 +145,8 @@ const cabezaSEO = `
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#05060a">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E%F0%9F%AA%90%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="${BASE}manifest.webmanifest">
+<link rel="apple-touch-icon" href="${BASE}icono-192.png">
 ${S.preloads}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"Sistema Solar a Escala","description":"${DESC}","applicationCategory":"EducationalApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0"},"inLanguage":"es"}
@@ -168,6 +171,68 @@ fs.copyFileSync(dir + 'assets/og.png', dir + 'publicar/og.png');
 fs.writeFileSync(dir + 'publicar/404.html', publico);
 fs.writeFileSync(dir + 'publicar/index.html', publico);
 
+/* ---- PWA: iconos procedurales, manifest y service worker ---- */
+fs.writeFileSync(dir + 'publicar/icono-192.png', icono(192));
+fs.writeFileSync(dir + 'publicar/icono-512.png', icono(512));
+
+fs.writeFileSync(dir + 'publicar/manifest.webmanifest', JSON.stringify({
+  name: 'Sistema Solar a Escala',
+  short_name: 'Sistema Solar',
+  description: DESC,
+  lang: 'es',
+  start_url: BASE,
+  scope: BASE,
+  display: 'standalone',
+  background_color: '#05060a',
+  theme_color: '#05060a',
+  icons: [
+    { src: BASE + 'icono-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+    { src: BASE + 'icono-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+  ]
+}, null, 2));
+
+/* El service worker se genera aquí porque el build conoce la lista exacta de
+   assets con hash. Estrategia: navegaciones red-primero (siempre fresco; sin
+   red responde el index cacheado, que además hace de comodín para /fecha/...),
+   y todo lo demás caché-primero (los assets son inmutables por hash).        */
+const versionSW = hash(Buffer.from(publico));
+const precacheSW = [
+  BASE,
+  ...S.assets.map(a => BASE + a.ruta),
+  BASE + 'manifest.webmanifest',
+  BASE + 'icono-192.png',
+  BASE + 'icono-512.png',
+  BASE + 'og.png'
+];
+fs.writeFileSync(dir + 'publicar/sw.js', `/* generado por build.mjs */
+const VERSION = 'ss-${versionSW}';
+const BASE = ${JSON.stringify(BASE)};
+const PRECACHE = ${JSON.stringify(precacheSW)};
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys()
+    .then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k))))
+    .then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  if (req.mode === 'navigate'){
+    e.respondWith(fetch(req).catch(() => caches.match(BASE)));
+    return;
+  }
+  e.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {
+    if (res.ok){
+      const copia = res.clone();
+      caches.open(VERSION).then(c => c.put(req, copia));
+    }
+    return res;
+  })));
+});
+`);
+
 /* cabeceras de caché: los assets llevan hash, así que son inmutables */
 fs.writeFileSync(dir + 'publicar/_headers',
 `/tex/*
@@ -176,6 +241,14 @@ fs.writeFileSync(dir + 'publicar/_headers',
   Cache-Control: public, max-age=31536000, immutable
 /og.png
   Cache-Control: public, max-age=604800
+/icono-192.png
+  Cache-Control: public, max-age=604800
+/icono-512.png
+  Cache-Control: public, max-age=604800
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 /
@@ -189,7 +262,8 @@ fs.writeFileSync(dir + 'publicar/vercel.json', JSON.stringify({
   headers: [
     { source: '/tex/(.*)', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] },
     { source: '/datos/(.*)', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] },
-    { source: '/(.*).html', headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }] }
+    { source: '/(.*).html', headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }] },
+    { source: '/sw.js', headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }] }
   ]
 }, null, 2));
 
