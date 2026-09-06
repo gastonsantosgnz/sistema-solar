@@ -128,7 +128,7 @@ function paso(ahora){
   fpsAcc += dt; fpsN++;
   if (fpsAcc > 0.5){ fps = fpsN / fpsAcc; fpsAcc = 0; fpsN = 0; }
 
-  actualizarSonido();                                    // rampas de audio, si está activo
+  actualizarSonido(dt);                                  // rampas de audio, si está activo
 
   if (state.comparando){ renderComparar(dt); return; }   // el estudio toma la pantalla
 

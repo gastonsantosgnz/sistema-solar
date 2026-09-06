@@ -10,6 +10,7 @@ function sincronizar(){
   $('#tViaLactea').classList.toggle('on', state.verViaLactea);
   $('#tLuz').classList.toggle('on', state.luzReal);
   $('#tSonido').classList.toggle('on', state.sonido);
+  $('#mSonido').classList.toggle('on', state.sonido);
   $('#tAsteroides').classList.toggle('on', state.verAsteroides);
   $('#tKuiper').classList.toggle('on', state.verTrans);
   $('#tSondas').classList.toggle('on', state.verSondas);
@@ -97,6 +98,7 @@ function montarControles(){
   empuje($('#mAdel'), 'w');
   empuje($('#mAtras'), 's');
   $('#mSalir').onclick = alternarModo;
+  $('#mSonido').onclick = () => alternarSonido();
   $('#mNave').onclick = () =>
     elegirVehiculo(state.vehiculo === 'sonda' ? 'nave' : state.vehiculo === 'nave' ? null : 'sonda');
   // turbo por toque: se queda encendido (el pulgar está ocupado en avanzar)

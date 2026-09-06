@@ -73,25 +73,50 @@ function crearAudio(){
   return true;
 }
 
+/* iOS calla el WebAudio cuando el interruptor de silencio está activado (lo
+   trata como sonido ambiental). Reproducir un <audio> —aunque sea silencio—
+   cambia la sesión a "reproducción" y destraba la salida. Se genera al vuelo:
+   un WAV de 0.1 s de ceros, sin archivos.                                   */
+let audioDestrabe = null;
+function destrabarSalida(){
+  if (audioDestrabe) return;
+  const n = 800, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+  const txt = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  txt(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); txt(8, 'WAVE');
+  txt(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 8000, true); v.setUint32(28, 16000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  txt(36, 'data'); v.setUint32(40, n * 2, true);
+  const a = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+  a.loop = true; a.playsInline = true; a.volume = 0.01;
+  a.play().catch(() => {});
+  audioDestrabe = a;
+}
+
 function alternarSonido(){
   state.sonido = !state.sonido;
   if (state.sonido && !crearAudio()) state.sonido = false;
   if (sndCtx){
-    if (state.sonido && sndCtx.state === 'suspended') sndCtx.resume();
+    if (state.sonido){
+      if (sndCtx.state !== 'running') sndCtx.resume();
+      destrabarSalida();
+    }
     sndMaster.gain.setTargetAtTime(state.sonido ? 0.8 : 0, sndCtx.currentTime, 0.15);
   }
   sincronizar();
 }
 
 /* llamado cada cuadro desde paso(): fija los objetivos de las rampas */
-function actualizarSonido(){
+let sndEmp = 0;                       // rampa propia del empuje (no depende de la nave visible)
+function actualizarSonido(dt){
   if (!sndCtx || !state.sonido) return;
   const t = sndCtx.currentTime;
   const callar = state.enMomento || state.comparando;
 
-  // empuje de la nave: sigue la rampa real; Shift lo engorda
-  const emp = (!callar && state.mode === 'free')
-    ? Math.min(1, intEmpuje * (teclas['shift'] ? 1.5 : 1)) : 0;
+  // empuje: sigue a los mandos (teclas o botones táctiles); Shift lo engorda
+  const empujando = !callar && state.mode === 'free' &&
+    (teclas['w'] || teclas['s'] || teclas['a'] || teclas['d'] || teclas['r'] || teclas['f'] || teclas[' ']);
+  sndEmp += ((empujando ? 1 : 0) - sndEmp) * (1 - Math.exp(-(dt || 0.016) / 0.16));
+  const emp = Math.min(1, sndEmp * (teclas['shift'] ? 1.5 : 1));
   sndEmpGain.gain.setTargetAtTime(emp * 0.5, t, 0.09);
   sndEmpFiltro.frequency.setTargetAtTime(70 + 170 * emp, t, 0.18);
 
