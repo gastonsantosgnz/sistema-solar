@@ -81,7 +81,7 @@ function actualizarCamara(dt){
     camQ.copy(_q).multiply(qp).multiply(qr);
 
     const base = distSuperficieMin() * 0.55 + 2;
-    let v = state.velFija || Math.min(base, 4e9);
+    let v = state.velFija || Math.min(base, 2e16);   // lejos de todo, ~2 000 años luz por segundo
     if (teclas['shift']) v *= 22;
     if (teclas['control']) v *= 0.06;
     const fwd = V3(0,0,-1).applyQuaternion(camQ);
@@ -333,6 +333,7 @@ function renderCuadro(dt){
   sky.uCamKm.value.set(cam[0], cam[1], cam[2]);
   sky.cons.visible = state.verConstelaciones;
   sky.mw.visible = state.verViaLactea;
+  actualizarGalaxia();                       // crossfade banda ↔ galaxia 3D según la distancia
   skyCam.fov = camera.fov; skyCam.aspect = camera.aspect; skyCam.updateProjectionMatrix();
 
   renderer.clear();

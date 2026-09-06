@@ -9,7 +9,7 @@
 
 const C_LUZ = 299792.458;                       // km/s
 const CINTA_LO = Math.log10(0.25);
-const CINTA_HI = Math.log10(9.2e10);            // tope real del motor con Shift
+const CINTA_HI = Math.log10(4.4e17);            // tope real del motor con Shift (~46 000 al/s)
 const posCinta = v =>
   (Math.log10(Math.max(v, 0.25)) - CINTA_LO) / (CINTA_HI - CINTA_LO) * 100;
 
@@ -21,7 +21,9 @@ const HITOS_V = [
   [192,        'PARKER',    ''],
   [C_LUZ,      'LUZ',       'luz'],
   [C_LUZ*100,  '×100 c',    ''],
-  [C_LUZ*1e4,  '×10 000 c', 'abajo']
+  [C_LUZ*1e4,  '×10 000 c', 'abajo'],
+  [LY,         '1 AL/S',    ''],
+  [LY*1000,    '1000 AL/S', 'abajo']
 ];
 
 (function construirCinta(){
@@ -68,7 +70,10 @@ const TRAYECTOS = [
   [384400,     'de la Tierra a la Luna en '],
   [AU,         'del Sol a la Tierra en '],
   [60 * AU,    'de punta a punta del sistema solar en '],
-  [4.246 * LY, 'hasta Alfa Centauri en ']
+  [4.246 * LY, 'hasta Alfa Centauri en '],
+  [26700 * LY, 'hasta el centro de la galaxia en '],
+  [1e5 * LY,   'de punta a punta de la galaxia en '],
+  [2.5e6 * LY, 'hasta Andrómeda en ']
 ];
 function contextoVel(v){
   if (v < 60)  return '×' + nf(v / 7.66, 1) + ' la Estación Espacial Internacional';
@@ -77,8 +82,14 @@ function contextoVel(v){
     const t = d / v;
     if (t >= 2 && t <= 5400) return txt + fmtTiempoV(t);
   }
-  return 'hasta Alfa Centauri en ' + fmtTiempoV(4.246 * LY / v);
+  return 'hasta Andrómeda en ' + fmtTiempoV(2.5e6 * LY / v);
 }
+
+/* destinos sin cuerpo: el centro galáctico y Andrómeda */
+const RUMBOS_FIJOS = [
+  { nombre: 'Centro galáctico', pos: GAL_CENTRO },
+  { nombre: 'Andrómeda', pos: M31_POS }
+];
 
 /* ¿a qué cuerpo apunta la nariz? (dentro de ~3.4°, o de su disco) */
 const _fwV = new THREE.Vector3(), _dV = new THREE.Vector3();
@@ -92,6 +103,14 @@ function rumboVuelo(){
     _dV.copy(c.rel).normalize();
     const holgura = _fwV.angleTo(_dV) - Math.asin(Math.min(1, radioEfectivo(c) / c.dist));
     if (holgura < mejorAng){ mejorAng = holgura; mejor = c; }
+  }
+  if (!mejor){
+    for (const f of RUMBOS_FIJOS){
+      _dV.set(f.pos.x - state.camKm[0], f.pos.y - state.camKm[1], f.pos.z - state.camKm[2]);
+      const dist = _dV.length();
+      _dV.divideScalar(dist);
+      if (_fwV.angleTo(_dV) < 0.05) return { def: { nombre: f.nombre }, dist, esFijo: true };
+    }
   }
   return mejor;
 }
@@ -128,7 +147,7 @@ function actualizarInstrumentos(){
   const b = rumboVuelo();
   const R = $('#instRumbo');
   if (b){
-    const dSup = Math.max(b.dist - radioEfectivo(b), 1);
+    const dSup = b.esFijo ? b.dist : Math.max(b.dist - radioEfectivo(b), 1);
     R.style.opacity = 1;
     R.innerHTML = 'RUMBO <b>' + b.def.nombre.toUpperCase() + '</b> · ' + distKm(dSup)
       + (v > 0.26 ? ' · llegas en ' + fmtTiempoV(dSup / v) : '')

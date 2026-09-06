@@ -71,7 +71,7 @@ void main(){
 
 const MW_FRAG = `
 ${GLSL_NOISE}
-uniform vec3 uPole, uCenter; uniform float uInt;
+uniform vec3 uPole, uCenter; uniform float uInt, uApaga;
 varying vec3 vDir;
 #include <common>
 #include <logdepthbuf_pars_fragment>
@@ -90,7 +90,7 @@ void main(){
   i += bulbo * banda * 0.55;
   i *= 0.155;
   vec3 col = mix(vec3(0.52,0.57,0.76), vec3(0.98,0.93,0.80), pow(max(toC,0.0), 6.0)*0.6 + bulbo*0.5);
-  gl_FragColor = vec4(col * i * uInt, 1.0);
+  gl_FragColor = vec4(col * i * uInt * uApaga, 1.0);   // uApaga: cede el paso a la galaxia 3D
   #include <logdepthbuf_fragment>
 }`;
 
@@ -141,7 +141,8 @@ function buildSky(THREE, data){
   const mwUni = {
     uPole:   { value: eq2ec(192.85948, 27.12825) },
     uCenter: { value: eq2ec(266.40510, -28.93617) },
-    uInt:    { value: 1.0 }
+    uInt:    { value: 1.0 },
+    uApaga:  { value: 1.0 }
   };
   const mw = new THREE.Mesh(
     new THREE.SphereGeometry(4.6, 96, 64),

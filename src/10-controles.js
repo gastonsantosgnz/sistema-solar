@@ -71,6 +71,7 @@ function montarControles(){
     `<button data-i="${i}">${s.nombre}<em>${nf(s.ly,2)} al</em></button>`).join('');
   cont.querySelectorAll('button').forEach(b => b.onclick = () => viajarA(NEAR_STARS[+b.dataset.i]));
   $('#btnVolver').onclick = () => { enfocar('tierra'); state.distTarget = encuadre(porId.tierra); };
+  $('#btnGalaxia').onclick = verGalaxia;
   $('#btnSistema').onclick = () => { verSistema(); document.body.classList.remove('menu'); };
   $('#btnEventos').onclick = calculaEventos;
 
