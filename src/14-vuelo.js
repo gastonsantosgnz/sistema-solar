@@ -85,11 +85,8 @@ function contextoVel(v){
   return 'hasta Andrómeda en ' + fmtTiempoV(2.5e6 * LY / v);
 }
 
-/* destinos sin cuerpo: el centro galáctico y Andrómeda */
-const RUMBOS_FIJOS = [
-  { nombre: 'Centro galáctico', pos: GAL_CENTRO },
-  { nombre: 'Andrómeda', pos: M31_POS }
-];
+/* destinos sin cuerpo: centro galáctico, Andrómeda y las nebulosas */
+const RUMBOS_FIJOS = DESTINOS_FIJOS;
 
 /* ¿a qué cuerpo apunta la nariz? (dentro de ~3.4°, o de su disco) */
 const _fwV = new THREE.Vector3(), _dV = new THREE.Vector3();

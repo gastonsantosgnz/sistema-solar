@@ -90,9 +90,12 @@ function actualizarHUD(){
      y el objetivo actual; una etiqueta que chocaría con otra ya colocada
      simplemente no se dibuja.                                              */
   const candidatos = [];
+  // lejos del Sol, el sistema solar es un punto: solo se rotula el Sol (los otros sistemas, su estrella)
+  const lejosDelSol = Math.hypot(state.camKm[0], state.camKm[1], state.camKm[2]) > 2000 * AU;
   for (const c of cuerpos){
     const e = etqs[c.def.id];
     if (!state.verEtiquetas || (c.esLuna && !lunasVisibles())){ e.style.display = 'none'; continue; }
+    if (lejosDelSol && !c.esLuna && c.def.id !== 'sol' && !c.def.ly){ e.style.display = 'none'; continue; }
     const p = proyectar(c.rel);
     const dentro = p.z > -1 && p.z < 1 && p.x > 4 && p.x < w - 8 && p.y > 8 && p.y < h - 8;
     let umbral = true;
@@ -158,7 +161,7 @@ function actualizarHUD(){
   }
 
   for (const {el, s} of etqEstrellas){
-    if (!state.verEtiquetas || !state.verConstelaciones){ el.style.display='none'; continue; }
+    if (!state.verEtiquetas || (!state.verConstelaciones && !s.siempre)){ el.style.display='none'; continue; }
     const p = proyectar(V3(s.dir.x*1e9, s.dir.y*1e9, s.dir.z*1e9));
     if (p.z > 1 || p.z < -1 || p.x < 40 || p.x > w - 40 || p.y < 20 || p.y > h - 20){ el.style.display='none'; continue; }
     const caja = { x1:p.x-4, y1:p.y-9, x2:p.x + s.label.length*6.4 + 8, y2:p.y+9 };
@@ -287,7 +290,10 @@ function construirIndice(){
       const c = porId[id];
       return `<button data-id="${id}"><i style="background:#${new THREE.Color(c.def.color).getHexString()}"></i>${c.def.nombre}</button>`;
     }).join('')}</div>`).join(''));
-  cont.querySelectorAll('button').forEach(b => b.onclick = () => enfocar(b.dataset.id));
+  cont.querySelectorAll('button').forEach(b => {
+    // las otras estrellas se visitan como sistema: sus órbitas en cuadro
+    b.onclick = () => porId[b.dataset.id].def.ly ? irASistema(b.dataset.id) : enfocar(b.dataset.id);
+  });
 }
 
 /* ---------- interacción ---------- */

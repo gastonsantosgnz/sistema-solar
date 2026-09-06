@@ -72,6 +72,15 @@ function montarControles(){
   cont.querySelectorAll('button').forEach(b => b.onclick = () => viajarA(NEAR_STARS[+b.dataset.i]));
   $('#btnVolver').onclick = () => { enfocar('tierra'); state.distTarget = encuadre(porId.tierra); };
   $('#btnGalaxia').onclick = verGalaxia;
+  // sistemas con planetas y cielo profundo
+  const sis = $('#sistemas');
+  sis.innerHTML = EXOESTRELLAS.map(e =>
+    `<button data-id="${e.id}">${e.nombre}<em>${EXOPLANETAS.filter(p => p.padre === e.id).length} pl · ${nf(e.ly, e.ly < 100 ? 1 : 0)} al</em></button>`).join('');
+  sis.querySelectorAll('button').forEach(b => b.onclick = () => irASistema(b.dataset.id));
+  const prof = $('#profundo');
+  prof.innerHTML = NEBULOSAS.map((n, i) =>
+    `<button data-i="${i}">${n.nombre}<em>${nf(n.ly, 0)} al</em></button>`).join('');
+  prof.querySelectorAll('button').forEach(b => b.onclick = () => irANebulosa(NEBULOSAS[+b.dataset.i]));
   $('#btnSistema').onclick = () => { verSistema(); document.body.classList.remove('menu'); };
   $('#btnEventos').onclick = calculaEventos;
 

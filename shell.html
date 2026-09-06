@@ -225,13 +225,16 @@ body.vuelo #bloqueNave{display:flex}
   text-transform:uppercase;padding:4px;cursor:pointer;transition:.14s;margin-top:3px}
 .ancho2:hover{border-color:var(--signal);color:var(--signal)}
 .ancho2:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
-#viajes,#momentos{display:flex;flex-direction:column;gap:1px}
-#viajes button,#momentos button{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+#viajes,#momentos,#sistemas,#profundo{display:flex;flex-direction:column;gap:1px}
+#viajes button,#momentos button,#sistemas button,#profundo button{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
   background:transparent;border:0;padding:3px 4px;cursor:pointer;text-align:left;
   font-family:var(--cond);font-size:11.5px;color:var(--ink-2);transition:.12s}
-#viajes button:hover,#momentos button:hover{color:var(--ink);background:rgba(255,255,255,.045)}
-#viajes button em,#momentos button em{font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
-#viajes button:focus-visible,#momentos button:focus-visible{outline:1px solid var(--signal);outline-offset:-1px}
+#viajes button:hover,#momentos button:hover,#sistemas button:hover,#profundo button:hover{color:var(--ink);background:rgba(255,255,255,.045)}
+#viajes button em,#momentos button em,#sistemas button em,#profundo button em{font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
+#viajes button:focus-visible,#momentos button:focus-visible,#sistemas button:focus-visible,#profundo button:focus-visible{outline:1px solid var(--signal);outline-offset:-1px}
+.mini{font-family:var(--cond);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--rule-alta);margin-top:4px}
+.etq.nebulosa span{color:rgba(214,170,210,.75);font-style:italic;text-transform:none;letter-spacing:.06em}
 #indice button.ancho,#btnVolver{width:100%;background:transparent;border:1px solid var(--rule-alta);
   color:var(--ink-2);font-family:var(--cond);font-size:11px;letter-spacing:.1em;
   text-transform:uppercase;padding:5px;cursor:pointer;transition:.14s;margin-top:3px}
@@ -637,7 +640,12 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
 
     <div class="panel bloque cerrado">
       <h4>Salir del sistema</h4>
+      <div class="mini">Sistemas con planetas</div>
+      <div id="sistemas"></div>
+      <div class="mini">Otras estrellas cercanas</div>
       <div id="viajes"></div>
+      <div class="mini">Cielo profundo</div>
+      <div id="profundo"></div>
       <button id="btnGalaxia" class="ancho2">Ver la galaxia desde fuera</button>
       <button id="btnVolver">Volver a la Tierra</button>
     </div>
