@@ -2,7 +2,29 @@
 
 Simulador 3D del sistema solar con distancias reales, efemérides del JPL y un cielo
 de 8 920 estrellas colocadas a su distancia verdadera. Funciona sin red: todo va
-incrustado en un solo archivo.
+incrustado en un solo archivo. Se instala como app (PWA) y sigue funcionando sin
+conexión.
+
+## Galería
+
+| ![La Tierra y la Luna desde órbita](assets/capturas/01-tierra.jpg) | ![Saturno de cerca](assets/capturas/02-saturno.jpg) |
+|:--:|:--:|
+| La Tierra y la Luna desde órbita, a escala real | Saturno: anillos procedurales y sombra propia |
+
+| ![Vista cenital del sistema](assets/capturas/03-sistema.jpg) | ![Comparador de tamaños](assets/capturas/04-comparador.jpg) |
+|:--:|:--:|
+| El sistema completo desde el norte de la eclíptica (la postal) | El comparador: hasta diez cuerpos lado a lado, el Sol entero |
+
+| ![Vuelo libre con instrumentos](assets/capturas/05-vuelo.jpg) | ![Cockpit en el teléfono](assets/capturas/06-movil.jpg) |
+|:--:|:--:|
+| Vuelo libre: nave, velocímetro logarítmico y rumbo | El cockpit táctil en el teléfono |
+
+| ![Momento: Punto azul pálido](assets/capturas/07-momento.jpg) | ![Modo atmósfera](assets/capturas/08-atmosfera.jpg) |
+|:--:|:--:|
+| Un Momento guiado: el Punto azul pálido de 1990 | A 80 km de altura: el velo atmosférico pinta el cielo |
+
+Las capturas se toman con el propio simulador (Compartir → *Capturar esta vista*) y
+viven en `assets/capturas/` como JPG de 1 600 px; no forman parte del build.
 
 Además del simulador trae una **postal descargable** —la vista cenital del sistema
 en cualquier fecha, compuesta en el navegador en 16:9, 9:16 o 1:1, con fase lunar y
@@ -28,11 +50,24 @@ Higía se quedan redondos porque de verdad lo son.
 
 El **vuelo libre** lleva instrumentos: velocímetro de cinta logarítmica con hitos
 reales por el camino (del sonido a la Voyager, la sonda Parker, la luz y miles de
-veces más allá), velocidad de crucero fijable con un clic en cualquier hito, una
-línea de contexto que traduce la cifra a algo imaginable, y el rumbo con tiempo de
-llegada comparado con el de la luz. Se pilota una **sonda o una nave** procedurales
-(cero assets), con propulsores ligados al empuje y luces de navegación, dibujadas a
-escala de cabina —lo único del universo que no está a escala real, y se declara.
+veces más allá), una fila de presets de **crucero** para fijar cualquiera de esos
+hitos como velocidad, una línea de contexto que traduce la cifra a algo imaginable,
+y el rumbo con tiempo de llegada comparado con el de la luz. Se pilota una **sonda
+o una nave** procedurales (cero assets), con propulsores ligados al empuje y luces
+de navegación, dibujadas a escala de cabina —lo único del universo que no está a
+escala real, y se declara. En el teléfono, un cockpit táctil: pulgar izquierdo
+empuja, pulgar derecho apunta.
+
+El **sonido** es sintetizado y honesto, sin un solo archivo de audio: solo se oye
+el empuje de la propia nave (vibración estructural, siguiendo la rampa real) y la
+sonificación de las magnetosferas al acercarse a Sol, Tierra, Júpiter o Saturno.
+Viene armado por defecto —despierta con el primer gesto, como exigen los
+navegadores— y si se apaga, la elección se recuerda.
+
+Cualquier vista se puede **capturar** como PNG a doble resolución, y en el teléfono
+tanto la captura como la postal se **comparten** directo a WhatsApp o Instagram con
+la hoja nativa del sistema. Fuera del rango 1800–2050, en el que los elementos del
+JPL son fiables, el reloj avisa que la precisión baja.
 
 ## Compilar
 
@@ -48,8 +83,8 @@ repositorio, así que no hace falta `npm install`.
 
 | Salida | Qué es | Peso |
 |---|---|---|
-| `dist/sistema-solar.html` | Fragmento sin `<html>`/`<head>`, para el Artifact. Todo incrustado como data URI porque ahí no se permiten peticiones externas. | 2.9 MB en un archivo |
-| `publicar/index.html` | Documento completo con SEO y Open Graph. Texturas y catálogos salen como archivos aparte. | 815 KB + 1.7 MB cacheables |
+| `dist/sistema-solar.html` | Fragmento sin `<html>`/`<head>`, para el Artifact. Todo incrustado como data URI porque ahí no se permiten peticiones externas. | 3.2 MB en un archivo |
+| `publicar/index.html` | Documento completo con SEO y Open Graph. Texturas y catálogos salen como archivos aparte. | 920 KB + 1.9 MB cacheables |
 
 En la versión del sitio, cada textura y cada catálogo lleva el hash de su contenido en
 el nombre (`tierra.ce92853f.jpg`), así que se sirven con `immutable` y caducidad de un
@@ -72,6 +107,12 @@ SITIO_URL=https://midominio.com node build.mjs                     # base /
 El build también escribe `publicar/404.html` como copia del index: GitHub Pages no
 admite rewrites, pero sirve `404.html` para rutas inexistentes, así que las rutas
 bonitas (`/fecha/...`) funcionan igual.
+
+Y genera la parte PWA: `manifest.webmanifest`, un `sw.js` con el precache exacto de
+los assets con hash (navegaciones red-primero, assets caché-primero), y los iconos
+`icono-192.png` / `icono-512.png`, que no son archivos del repositorio sino un
+Saturno dibujado por código en [iconos.mjs](iconos.mjs) con un codificador PNG
+mínimo. El service worker solo se registra en la salida sitio, nunca en el artifact.
 
 ## Publicar
 
@@ -104,10 +145,14 @@ npx wrangler pages deploy publicar
 rewrite para que `/fecha/...` y `/date/...` sirvan la app sin un 404, y las cabeceras de
 caché de los assets.
 
-Si tu hosting no lee ninguno de esos archivos, basta con dos reglas:
+Si tu hosting no lee ninguno de esos archivos, basta con tres reglas:
 
 - `/tex/*` y `/datos/*` → `Cache-Control: public, max-age=31536000, immutable`
 - `/fecha/*` y `/date/*` → servir `/index.html` con estado 200 (no redirección)
+- `/sw.js` y `/manifest.webmanifest` → `Cache-Control: max-age=0, must-revalidate`
+
+La PWA (instalación y modo sin conexión) requiere HTTPS; en `localhost` funciona
+para probar.
 
 ## Qué contiene el sitio
 
@@ -118,6 +163,7 @@ Si tu hosting no lee ninguno de esos archivos, basta con dos reglas:
 | `/eclipse/<slug>/` | Una página por eclipse, 2026–2040 |
 | `/cuerpo/<id>/` | Ficha de cada planeta, asteroide y cometa |
 | `/sitemap.xml`, `/robots.txt` | Para buscadores |
+| `/manifest.webmanifest`, `/sw.js`, `/icono-*.png` | La PWA: instalación e uso sin conexión |
 
 Las páginas de eclipse no son plantillas rellenadas: la fecha, la hora del máximo, el
 tipo y las coordenadas del punto de máximo se calculan resolviendo la geometría de los
@@ -189,3 +235,13 @@ Si necesitas una licencia distinta para un uso comercial cerrado, escribe.
 - Los cometas se propagan como problema de dos cuerpos: lejos de su época los pasos por
   el perihelio se desvían (Halley da enero de 2062 frente a julio de 2061 real).
 - La Vía Láctea es procedural, no fotográfica.
+- Las texturas son de 2K: de muy cerca, el detalle de nubes y suelo es procedural,
+  no geografía real.
+- La nave y la sonda se dibujan a escala de cabina, no a escala real.
+- La sonificación de magnetosferas es una traducción sintética, no una grabación.
+- Sin conexión funciona el simulador completo; las páginas estáticas
+  (`/eclipse/`, `/cuerpo/`) necesitan red.
+
+## Hoja de ruta
+
+Lo que viene, en orden y con su diseño técnico, está en [ROADMAP.md](ROADMAP.md).

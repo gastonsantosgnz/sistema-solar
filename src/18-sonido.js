@@ -13,7 +13,7 @@
 const CAMPOS_SND = [
   { id: 'jupiter', f: 34, bat: 1.7, alcance: 90, nivel: 0.42 },
   { id: 'saturno', f: 46, bat: 1.1, alcance: 60, nivel: 0.34 },
-  { id: 'tierra',  f: 62, bat: 2.3, alcance: 30, nivel: 0.30 },
+  { id: 'tierra',  f: 62, bat: 2.3, alcance: 30, nivel: 0.22 },   // es lo primero que se oye: discreto
   { id: 'sol',     f: 23, bat: 0.6, alcance: 45, nivel: 0.40 }
 ];
 let sndCtx = null, sndMaster = null, sndEmpGain = null, sndEmpFiltro = null;
@@ -92,17 +92,33 @@ function destrabarSalida(){
   audioDestrabe = a;
 }
 
+/* enciende la salida (solo dentro de un gesto del usuario) */
+function despertarAudio(){
+  if (!state.sonido) return;
+  if (!crearAudio()){ state.sonido = false; sincronizar(); return; }
+  if (sndCtx.state !== 'running') sndCtx.resume();
+  destrabarSalida();
+  sndMaster.gain.setTargetAtTime(0.8, sndCtx.currentTime, 0.15);
+}
+
 function alternarSonido(){
   state.sonido = !state.sonido;
-  if (state.sonido && !crearAudio()) state.sonido = false;
-  if (sndCtx){
-    if (state.sonido){
-      if (sndCtx.state !== 'running') sndCtx.resume();
-      destrabarSalida();
-    }
-    sndMaster.gain.setTargetAtTime(state.sonido ? 0.8 : 0, sndCtx.currentTime, 0.15);
-  }
+  try { localStorage.setItem('ss-sonido', state.sonido ? '1' : '0'); } catch (e){}
+  if (state.sonido) despertarAudio();
+  else if (sndCtx) sndMaster.gain.setTargetAtTime(0, sndCtx.currentTime, 0.15);
   sincronizar();
+}
+
+/* Armado por defecto: el audio arranca solo con el primer gesto de la sesión.
+   Si el usuario lo apagó alguna vez, se respeta su elección.               */
+try { if (localStorage.getItem('ss-sonido') === '0') state.sonido = false; } catch (e){}
+sincronizar();
+{
+  const primerGesto = () => {
+    for (const ev of ['pointerdown', 'keydown', 'touchend']) removeEventListener(ev, primerGesto, true);
+    despertarAudio();
+  };
+  for (const ev of ['pointerdown', 'keydown', 'touchend']) addEventListener(ev, primerGesto, true);
 }
 
 /* llamado cada cuadro desde paso(): fija los objetivos de las rampas */
