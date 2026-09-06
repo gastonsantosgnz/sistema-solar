@@ -409,6 +409,22 @@ function crearOrbitas(){
     line.frustumCulled = false;
     orbitGroup.add(line); orbitas[m.id] = line;
   }
+  // órbitas de exoplanetas: círculos alrededor de su estrella
+  for (const p of EXOPLANETAS){
+    const n = 128, arr = new Float32Array(n*3);
+    for (let k = 0; k < n; k++){
+      const th = k/n * Math.PI*2;
+      arr[k*3] = p.a*Math.cos(th)/U; arr[k*3+1] = p.a*Math.sin(th)/U; arr[k*3+2] = 0;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(arr,3));
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e9);
+    const line = new THREE.LineLoop(g, new THREE.LineBasicMaterial({
+      color: 0x9fb4c8, transparent:true, opacity:0.16, depthWrite:false
+    }));
+    line.frustumCulled = false;
+    orbitGroup.add(line); orbitas[p.id] = line;
+  }
 }
 
 /* ---------- trayectorias reales de las sondas ---------- */
@@ -440,6 +456,19 @@ SONDAS.forEach(s => crearCuerpo({
   id:s.id, nombre:s.nombre, tipo:s.tipo, clase:'sonda', r:0.004, rot:1,
   color:s.color, shader:'ROCK', nota:s.nota, sonda:s
 }, false));
+/* Otros soles: estrellas fijas en su posición real y sus planetas como
+   "lunas" de la estrella (el motor ya sabe orbitar alrededor de un padre) */
+for (const e of EXOESTRELLAS){
+  const c = crearCuerpo(e, false);
+  const d = eqToEcl(e.ra, e.dec).multiplyScalar(e.ly * LY);
+  c.pos[0] = d.x; c.pos[1] = d.y; c.pos[2] = d.z;
+}
+for (const p of EXOPLANETAS){ p.estrella = p.padre; crearCuerpo(p, true); }
+for (const def of [...EXOESTRELLAS, ...EXOPLANETAS]){
+  if (!def.paleta) continue;
+  const u = porId[def.id].uni;
+  u.uCA.value = hexV3(def.paleta[0]); u.uCB.value = hexV3(def.paleta[1]); u.uCC.value = hexV3(def.paleta[2]);
+}
 crearOrbitas();
 crearRutas();
 
@@ -520,6 +549,11 @@ function actualizarPosiciones(jd){
     menorPos(m.el, jd, _p);
     const c = porId[m.id];
     c.pos[0] = _p[0]; c.pos[1] = _p[1]; c.pos[2] = _p[2];
+  }
+  for (const p of EXOPLANETAS){
+    moonPos(p, jd, _p);
+    const c = porId[p.id], pa = porId[p.padre];
+    c.pos[0] = pa.pos[0] + _p[0]; c.pos[1] = pa.pos[1] + _p[1]; c.pos[2] = pa.pos[2] + _p[2];
   }
   for (const s of SONDAS){
     const c = porId[s.id];

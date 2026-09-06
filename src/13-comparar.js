@@ -19,7 +19,9 @@ const COMP_GRUPOS = [
   ['Enanos',     ['pluton', 'ceres']],
   ['Asteroides', ['vesta', 'palas', 'higia', 'eros', 'apofis']],
   ['Cometas',    ['halley', 'encke', 'churyumov', 'halebopp']],
-  ['Lunas',      MOONS.map(m => m.id)]
+  ['Lunas',      MOONS.map(m => m.id)],
+  ['Otros soles', EXOESTRELLAS.map(e => e.id)],
+  ['Exoplanetas', EXOPLANETAS.map(p => p.id)]
 ];
 const COMP_PRESETS = [
   ['Tierra y Luna',         ['tierra', 'luna']],

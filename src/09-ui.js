@@ -208,7 +208,8 @@ function actualizarPanel(){
   const filas = [];
   const F = (k,v) => filas.push(`<div class="fila"><dt>${k}</dt><dd>${v}</dd></div>`);
 
-  if (!d.sonda) F('Radio', nf(d.r, d.r<100?2:0) + ' km');
+  if (!d.sonda) F('Radio', nf(d.r, d.r<100?2:0) + ' km' + (d.estimado ? ' · estimado' : ''));
+  if (d.ly) F('Distancia', nf(d.ly, d.ly < 100 ? 2 : 0) + ' años luz');
   if (d.mass) F('Masa', d.mass.toExponential(3).replace('e+',' × 10<sup>')+'</sup>' + ' kg');
   if (d.grav) F('Gravedad', nf(d.grav,2) + ' m/s²');
   if (d.temp !== undefined) F('Temperatura', (d.temp>0?'':'') + nf(d.temp,0) + ' °C');
@@ -277,7 +278,9 @@ function construirIndice(){
     ['Asteroides', ['vesta','palas','higia','eros','apofis']],
     ['Cometas',    ['halley','encke','churyumov','halebopp']],
     ['Sondas',     SONDAS.map(s => s.id)],
-    ['Lunas',      MOONS.map(m=>m.id)]
+    ['Lunas',      MOONS.map(m=>m.id)],
+    ['Otros soles', EXOESTRELLAS.map(e => e.id)],
+    ['Exoplanetas', EXOPLANETAS.map(p => p.id)]
   ];
   cont.insertAdjacentHTML('beforeend', grupos.map(([t, ids]) => `
     <div class="grupo"><h4>${t}</h4>${ids.map(id => {

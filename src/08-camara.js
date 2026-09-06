@@ -194,9 +194,10 @@ function renderCuadro(dt){
     c.mesh.quaternion.setFromAxisAngle(EJE_Y, spin);
     if (c.nubes) c.nubes.quaternion.setFromAxisAngle(EJE_Y, spin + T * 0.11);  // las nubes derivan
 
-    // iluminación
-    const rSol = c.def.id === 'sol' ? 1 : Math.hypot(c.pos[0]-sol[0], c.pos[1]-sol[1], c.pos[2]-sol[2]);
-    sunDirW.set(sol[0]-c.pos[0], sol[1]-c.pos[1], sol[2]-c.pos[2]).normalize();
+    // iluminación: desde el Sol, o desde su propia estrella si es un exoplaneta
+    const fuente = c.def.estrella ? porId[c.def.estrella].pos : sol;
+    const rSol = c.def.shader === 'SUN' ? 1 : Math.hypot(c.pos[0]-fuente[0], c.pos[1]-fuente[1], c.pos[2]-fuente[2]);
+    sunDirW.set(fuente[0]-c.pos[0], fuente[1]-c.pos[1], fuente[2]-c.pos[2]).normalize();
     c.uni.uSunDir.value.copy(sunDirW);
     const rel = AU / Math.max(rSol, 1);
     c.uni.uLight.value = state.luzReal ? Math.min(rel*rel, 12)
@@ -225,7 +226,7 @@ function renderCuadro(dt){
       const mundo = pxDeseado * 2 * Math.tan(camera.fov*DEG/2) / (renderer.domElement.height/renderer.getPixelRatio()) * (dist/U);
       c.glow.scale.setScalar(mundo);
       let br = c.def.sonda ? 0.85
-             : c.def.id === 'sol' ? 1
+             : c.def.shader === 'SUN' ? 1
              : Math.min(1, (c.def.r*c.def.r) / (rSol/AU) / (dist/AU) / 4e6);
       br = Math.max(br, 0.05);
       c.glow.material.opacity = Math.min(1, br) * Math.min(1, 1.2 - pxRad/9);
@@ -315,6 +316,16 @@ function renderCuadro(dt){
     const f2 = Math.min(1, Math.max(0, Math.log(dpa / (m.a * 0.25)) / Math.log(24)))
              * Math.min(1, Math.max(0, 1 - Math.log(dpa / (m.a * 90)) / Math.log(14)));
     l.visible = state.verOrbitas && lunasVisibles() && f2 > 0.02;
+    l.material.opacity = 0.30 * f2;
+  }
+  for (const p of EXOPLANETAS){
+    const l = orbitas[p.id]; if (!l) continue;
+    const pa = porId[p.padre].pos;
+    l.position.set((pa[0]-cam[0])/U, (pa[1]-cam[1])/U, (pa[2]-cam[2])/U);
+    const dpa = porId[p.padre].dist;
+    const f2 = Math.min(1, Math.max(0, Math.log(dpa / (p.a * 0.25)) / Math.log(24)))
+             * Math.min(1, Math.max(0, 1 - Math.log(dpa / (p.a * 90)) / Math.log(14)));
+    l.visible = state.verOrbitas && f2 > 0.02;
     l.material.opacity = 0.30 * f2;
   }
 
