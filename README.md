@@ -15,13 +15,9 @@ conexión.
 |:--:|:--:|
 | El sistema completo desde el norte de la eclíptica (la postal) | El comparador: hasta diez cuerpos lado a lado, el Sol entero |
 
-| ![Vuelo libre con instrumentos](assets/capturas/05-vuelo.jpg) | ![Cockpit en el teléfono](assets/capturas/06-movil.jpg) |
+| ![Vuelo libre con instrumentos](assets/capturas/05-vuelo.jpg) | ![Momento: la Gran Conjunción](assets/capturas/06-momento.jpg) |
 |:--:|:--:|
-| Vuelo libre: nave, velocímetro logarítmico y rumbo | El cockpit táctil en el teléfono |
-
-| ![Momento: Punto azul pálido](assets/capturas/07-momento.jpg) | ![Modo atmósfera](assets/capturas/08-atmosfera.jpg) |
-|:--:|:--:|
-| Un Momento guiado: el Punto azul pálido de 1990 | A 80 km de altura: el velo atmosférico pinta el cielo |
+| Vuelo libre: nave, velocímetro logarítmico, crucero y rumbo | Un Momento guiado: la Gran Conjunción de 2020 vista desde la Tierra |
 
 Las capturas se toman con el propio simulador (Compartir → *Capturar esta vista*) y
 viven en `assets/capturas/` como JPG de 1 600 px; no forman parte del build.
