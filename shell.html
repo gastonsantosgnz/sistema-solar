@@ -474,11 +474,20 @@ body.comparando #hud,body.comparando #etiquetas,body.comparando #reticula{displa
 body.menu #btnMenu i:nth-child(1){transform:translateY(5px) rotate(45deg)}
 body.menu #btnMenu i:nth-child(2){opacity:0}
 body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
-#mandos{position:absolute;right:12px;bottom:96px;z-index:13;flex-direction:column;gap:8px}
-#mandos button{width:46px;height:46px;background:var(--panel);border:1px solid var(--rule-alta);
-  color:var(--ink-2);font-size:13px;cursor:pointer;display:grid;place-items:center;
-  -webkit-user-select:none;user-select:none;touch-action:none}
-#mandos button:active{border-color:var(--signal);color:var(--signal)}
+/* cockpit táctil: racimo vertical en el borde derecho, a la altura del pulgar */
+#mandos{position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:13;
+  flex-direction:column;gap:7px}
+#mandos button{width:52px;height:52px;background:var(--panel);border:1px solid var(--rule-alta);
+  color:var(--ink-2);font-size:14px;cursor:pointer;display:grid;place-items:center;
+  -webkit-user-select:none;user-select:none;touch-action:none;
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);transition:.12s}
+#mandos button:active,#mandos button.on{border-color:var(--signal);color:var(--signal);
+  background:rgba(255,91,65,.1)}
+#mAdel,#mAtras{height:64px;font-size:16px}
+#mTurbo{font-family:var(--mono);font-size:11px;letter-spacing:.06em}
+#mSalir{height:40px;font-family:var(--mono);font-size:16px;color:var(--muted)}
+#mNave svg{display:none}
+#mNave svg.on{display:block}
 
 @media (max-width:900px) and (min-width:721px){
   #panelObjetivo{width:246px}
@@ -507,12 +516,14 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   body.menu #colIzq,body.menu #panelObjetivo{opacity:0;pointer-events:none}
   #btnMenu{display:flex}
   body.vuelo #mandos{display:flex}
-  body.menu #instrumentos{opacity:0}
-  #instrumentos{left:8px;right:66px;bottom:152px;transform:none;width:auto;padding:8px 10px 6px}
+  /* en vuelo, el cockpit manda: la consola de fecha y el selector se retiran */
+  body.vuelo #consolaTiempo,body.vuelo #bloqueNave,body.vuelo #tVuelo{display:none}
+  body.menu #instrumentos,body.menu #mandos{opacity:0;pointer-events:none}
+  #instrumentos{left:8px;right:8px;bottom:8px;transform:none;width:auto;padding:8px 10px 6px}
   #instCtx{display:none}
   #instVel{font-size:13px}
   #lectura{display:none}
-  #aviso{top:auto;bottom:152px;font-size:12px;padding:9px 13px}
+  #aviso{top:auto;bottom:130px;font-size:12px;padding:9px 13px}
   .etq.estrella{display:none!important}
 }
 @media (max-width:400px){
@@ -665,8 +676,15 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
 
   <button id="btnMenu" aria-label="Mostrar controles"><i></i><i></i><i></i></button>
   <div id="mandos">
-    <button id="mAdel" aria-label="Acelerar">&#9650;</button>
-    <button id="mAtras" aria-label="Frenar">&#9660;</button>
+    <button id="mSalir" aria-label="Salir del vuelo libre" title="Salir del vuelo">&times;</button>
+    <button id="mNave" aria-label="Cambiar nave" title="Cambiar nave">
+      <svg data-n="sonda" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M3 6.5A8.6 8.6 0 0 0 11.5 15"/><path d="M4.6 4.6l7 7"/><circle cx="12.6" cy="12.6" r="1.4"/><path d="M12.6 14v2.2M10.4 16.2h4.4"/></svg>
+      <svg data-n="nave" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M9 1.6c1.9 1.9 2.7 4.2 2.7 6.8 0 1.7-.4 3.2-1 4.4H7.3c-.6-1.2-1-2.7-1-4.4 0-2.6.8-4.9 2.7-6.8z"/><path d="M6.4 10.4 4 13.2h2.6M11.6 10.4l2.4 2.8h-2.6"/><path d="M8 12.8h2L9 15.6z"/></svg>
+      <svg data-n="0" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="9" cy="9" r="6.4"/><path d="M4.5 13.5 13.5 4.5"/></svg>
+    </button>
+    <button id="mAdel" aria-label="Acelerar (mantener)">&#9650;</button>
+    <button id="mTurbo" aria-label="Turbo por 22" title="Turbo">&times;22</button>
+    <button id="mAtras" aria-label="Frenar (mantener)">&#9660;</button>
   </div>
 </div>
 

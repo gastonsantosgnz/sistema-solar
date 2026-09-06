@@ -16,6 +16,8 @@ function sincronizar(){
   $('#tVuelo').classList.toggle('on', state.mode === 'free');
   document.querySelectorAll('#naveSeg button').forEach(b =>
     b.classList.toggle('activo', (state.vehiculo || '0') === b.dataset.n));
+  document.querySelectorAll('#mNave svg').forEach(s =>
+    s.classList.toggle('on', (state.vehiculo || '0') === s.dataset.n));
   $('#velTxt').textContent = state.playing ? velInfo() : 'pausa';
   $('#btnPlay').textContent = state.playing ? '❙❙' : '▶';
   document.body.classList.toggle('vuelo', state.mode === 'free');
@@ -94,6 +96,15 @@ function montarControles(){
   };
   empuje($('#mAdel'), 'w');
   empuje($('#mAtras'), 's');
+  $('#mSalir').onclick = alternarModo;
+  $('#mNave').onclick = () =>
+    elegirVehiculo(state.vehiculo === 'sonda' ? 'nave' : state.vehiculo === 'nave' ? null : 'sonda');
+  // turbo por toque: se queda encendido (el pulgar está ocupado en avanzar)
+  $('#mTurbo').onclick = () => {
+    teclas['shift'] = !teclas['shift'];
+    $('#mTurbo').classList.toggle('on', teclas['shift']);
+    if (navigator.vibrate) navigator.vibrate(8);
+  };
 }
 
 /* Encuadra el sistema completo desde arriba del plano de la eclíptica */

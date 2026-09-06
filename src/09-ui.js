@@ -425,10 +425,15 @@ addEventListener('keyup', e => {
   if (!e.shiftKey) teclas['shift'] = false;
   if (!e.ctrlKey)  teclas['control'] = false;
 });
-addEventListener('blur', () => { for (const k in teclas) teclas[k] = false; });
+addEventListener('blur', () => {
+  for (const k in teclas) teclas[k] = false;
+  $('#mTurbo').classList.remove('on');
+});
 
 function alternarModo(){
   cerrarMomento();               // pilotar y contemplar no se mezclan
+  teclas['shift'] = false;       // el turbo táctil no sobrevive al cambio de modo
+  $('#mTurbo').classList.remove('on');
   if (state.mode === 'orbit'){
     state.mode = 'free';
     freeYaw = state.yaw + Math.PI/2; freePitch = -state.pitch; freeRoll = 0;
