@@ -9,6 +9,7 @@ function sincronizar(){
   $('#tConst').classList.toggle('on', state.verConstelaciones);
   $('#tViaLactea').classList.toggle('on', state.verViaLactea);
   $('#tLuz').classList.toggle('on', state.luzReal);
+  $('#tSonido').classList.toggle('on', state.sonido);
   $('#tAsteroides').classList.toggle('on', state.verAsteroides);
   $('#tKuiper').classList.toggle('on', state.verTrans);
   $('#tSondas').classList.toggle('on', state.verSondas);
