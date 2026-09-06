@@ -13,39 +13,44 @@ const CINTA_HI = Math.log10(9.2e10);            // tope real del motor con Shift
 const posCinta = v =>
   (Math.log10(Math.max(v, 0.25)) - CINTA_LO) / (CINTA_HI - CINTA_LO) * 100;
 
+/* los hitos: marcas de la cinta (instrumento) y presets de crucero (botones) */
+const HITOS_V = [
+  [0.343,      'SONIDO',    'ini'],
+  [17,         'VOYAGER',   ''],
+  [29.8,       'TIERRA',    'abajo'],
+  [192,        'PARKER',    ''],
+  [C_LUZ,      'LUZ',       'luz'],
+  [C_LUZ*100,  '×100 c',    ''],
+  [C_LUZ*1e4,  '×10 000 c', 'abajo']
+];
+
 (function construirCinta(){
   let html = '<div class="cintaEje"></div>';
   for (let e = 0; e <= 10; e++)
     html += `<i class="ctick" style="left:${posCinta(Math.pow(10, e)).toFixed(2)}%"></i>`;
-  const HITOS = [
-    [0.343,      'SONIDO',    'ini'],
-    [17,         'VOYAGER',   ''],
-    [29.8,       'TIERRA',    'abajo'],
-    [192,        'PARKER',    ''],
-    [C_LUZ,      'LUZ',       'luz'],
-    [C_LUZ*100,  '×100 c',    ''],
-    [C_LUZ*1e4,  '×10 000 c', 'abajo']
-  ];
-  for (const [v, t, cls] of HITOS)
-    html += `<button class="chito ${cls}" data-v="${v}" title="Fijar velocidad: ${t}"><i></i><span>${t}</span></button>`;
+  for (const [v, t, cls] of HITOS_V)
+    html += `<b class="chito ${cls}" data-v="${v}" style="left:${posCinta(v).toFixed(2)}%"><i></i><span>${t}</span></b>`;
   html += '<div id="cintaFill"></div><div id="cintaAguja"></div>';
-  const cont = $('#instCinta');
-  cont.innerHTML = html;
-  cont.querySelectorAll('.chito').forEach((b, i) => {
-    b.style.left = posCinta(HITOS[i][0]).toFixed(2) + '%';
-    b.onclick = () => fijarVel(state.velFija === HITOS[i][0] ? null : HITOS[i][0]);
+  $('#instCinta').innerHTML = html;
+
+  // fila de crucero: AUTO + un chip por hito; tocar el activo vuelve a AUTO
+  const chips = $('#instChips');
+  chips.innerHTML = '<button class="chipV on" data-v="0" title="Velocidad automática: escala con la distancia">Auto</button>'
+    + HITOS_V.map(([v, t]) => `<button class="chipV" data-v="${v}" title="Fijar crucero: ${t}">${t}</button>`).join('');
+  chips.querySelectorAll('button').forEach(b => b.onclick = () => {
+    const v = +b.dataset.v;
+    fijarVel(v === 0 || state.velFija === v ? null : v);
   });
 })();
 
 /* velocidad de crucero: null = automática (escala con la distancia) */
 function fijarVel(v){
   state.velFija = v;
-  $('#instModo').textContent = v ? 'FIJA' : 'AUTO';
-  $('#instModo').classList.toggle('on', !!v);
+  document.querySelectorAll('#instChips button').forEach(b =>
+    b.classList.toggle('on', v ? +b.dataset.v === v : +b.dataset.v === 0));
   document.querySelectorAll('#instCinta .chito').forEach(b =>
     b.classList.toggle('fija', !!v && +b.dataset.v === v));
 }
-$('#instModo').onclick = () => fijarVel(null);
 
 function fmtTiempoV(s){
   if (!isFinite(s) || s < 0) return '—';
