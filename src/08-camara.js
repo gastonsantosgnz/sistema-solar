@@ -304,7 +304,7 @@ function renderCuadro(dt){
     const l = orbitas[m.id]; if (!l) continue;
     l.position.copy(solRel);
     const activa = state.focus === m.id;
-    l.visible = state.verOrbitas && fade > 0.01 && (state.verAsteroides || activa);
+    l.visible = state.verOrbitas && fade > 0.01 && (state.verAsteroides || activa || m.clase === 'dwarf');
     l.material.opacity = (m.clase === 'comet' ? 0.22 : 0.15) * fade * (activa ? 2.2 : 1);
   }
   if (state.verOrbitas && state.verLunas && porId.tierra.dist < 384400*260) regeneraOrbitaLuna(state.jd);

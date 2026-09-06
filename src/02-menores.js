@@ -35,12 +35,28 @@ const MENORES = [
   { id:'halebopp', nombre:'Hale-Bopp', tipo:'Cometa', clase:'comet', r:30.0, rot:0.4,
     el:{ a:177.433383912, e:0.994981003, i:89.2875942, om:282.7334214, w:130.4146671, ma:3.8783863, ep:2459837.5 },
     nota:'El gran cometa de 1997: visible a simple vista durante 18 meses. No volverá hasta el año ~4385.' },
+  /* planetas enanos transneptunianos: elementos JPL SBDB (full-prec, época 2461200.5, consultados 2026-09-06) */
+  { id:'eris', nombre:'Eris', tipo:'Planeta enano', clase:'dwarf', r:1163, rot:1.079, shader:'ICEMOON', color:0xe8e4dc,
+    el:{ a:67.93394687853566, e:0.4382385347971672, i:43.9258279471791, om:36.00477044417249, w:150.7949235840312, ma:211.774434275007, ep:2461200.5 },
+    nota:'El cuerpo que destronó a Plutón: al descubrirse en 2005, más masivo que él, obligó a definir qué es un planeta. Tarda 559 años en dar la vuelta al Sol.' },
+  { id:'makemake', nombre:'Makemake', tipo:'Planeta enano', clase:'dwarf', r:715, rot:0.951, shader:'MARS', color:0xc99a7a,
+    el:{ a:45.57093317300052, e:0.1588889953992523, i:29.02785603743067, om:79.2948338209406, w:297.0922733397207, ma:169.9379962048232, ep:2461200.5 },
+    nota:'Descubierto en la Pascua de 2005 y bautizado por el dios creador de la isla de Pascua. Rojizo por el metano congelado de su superficie.' },
+  { id:'haumea', nombre:'Haumea', tipo:'Planeta enano', clase:'dwarf', r:780, rot:0.163, shader:'ICEMOON', color:0xe0e4ea,
+    el:{ a:43.06029023650952, e:0.1944430148898797, i:28.20847393040364, om:121.7860561329425, w:240.6905472508661, ma:223.2104118812299, ep:2461200.5 },
+    nota:'Gira tan rápido (un día de 4 horas) que se estiró hasta parecer un balón de rugby de 2 100 km de largo. Tiene anillo y dos lunas.' },
+  { id:'gonggong', nombre:'Gonggong', tipo:'Planeta enano', clase:'dwarf', r:615, rot:0.933, shader:'MARS', color:0xa6503c,
+    el:{ a:66.86666567773766, e:0.5042510000302973, i:30.89906721170288, om:336.8383156185827, w:206.6232839773693, ma:111.664541568459, ep:2461200.5 },
+    nota:'El mayor cuerpo del sistema solar sin nombre hasta 2020: lo bautizó una votación pública con el dios chino del agua.' },
+  { id:'sedna', nombre:'Sedna', tipo:'Planeta enano', clase:'dwarf', r:500, rot:0.428, shader:'MARS', color:0xb4553a,
+    el:{ a:543.7195289104732, e:0.8598824585187618, i:11.92527582847476, om:144.5061662673739, w:311.0987725939751, ma:358.5956944005428, ep:2461200.5 },
+    nota:'El más lejano de los cuerpos grandes: su órbita de 11 000 años lo lleva a 900 UA. Hoy, cerca de su perihelio, es la única época en milenios en que se le puede ver.' },
 ];
 /* estética por clase */
 for (const m of MENORES){
   if (m.clase === 'comet'){ m.color = 0xbfd4e8; m.shader = 'ICEMOON'; }
   else if (m.id === 'vesta'){ m.color = 0xb5a583; m.shader = 'ROCK'; }
-  else { m.color = 0x9a9186; m.shader = 'ROCK'; }
+  else if (!m.shader){ m.color = 0x9a9186; m.shader = 'ROCK'; }
 }
 
 /* Posición heliocéntrica (km, eclíptica J2000) desde elementos osculantes */

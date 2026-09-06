@@ -103,7 +103,7 @@ function actualizarHUD(){
       const vis = e.style.display !== 'none';
       umbral = porId[c.def.padre].dist < c.def.a * (vis ? 150 : 130) && c.pxRad > (vis ? 0.27 : 0.35);
     }
-    if (c.def.el && !state.verAsteroides && c.def.id !== state.focus) umbral = false;
+    if (c.def.el && !state.verAsteroides && c.def.id !== state.focus && c.def.clase !== 'dwarf') umbral = false;
     if (c.def.sonda && (!state.verSondas || !c.lanzada)) umbral = false;
     if (!dentro || !umbral){ e.style.display = 'none'; continue; }
     candidatos.push({ c, e, p });
@@ -277,7 +277,7 @@ function construirIndice(){
   const grupos = [
     ['Estrella',   ['sol']],
     ['Planetas',   BODIES.filter(b=>b.clase==='planet').map(b=>b.id)],
-    ['Enanos',     ['pluton','ceres']],
+    ['Enanos',     ['pluton','eris','makemake','haumea','gonggong','sedna','ceres']],
     ['Asteroides', ['vesta','palas','higia','eros','apofis']],
     ['Cometas',    ['halley','encke','churyumov','halebopp']],
     ['Sondas',     SONDAS.map(s => s.id)],
@@ -396,6 +396,7 @@ addEventListener('keydown', e => {
     if (k === 'escape') cerrarSelector();
     return;
   }
+  if ($('#buscador').classList.contains('abierto')) return;   // el buscador maneja sus teclas
   if (state.comparando){
     if (k === 'escape') cerrarComparar();
     else if (k === 'arrowleft') pasoComp(-1);
@@ -423,6 +424,7 @@ addEventListener('keydown', e => {
   else if (k === 'v'){ alternarModo(); }
   else if (k === 'g'){ state.verViaLactea = !state.verViaLactea; sincronizar(); }
   else if (k === '?'){ $('#ayuda').classList.toggle('abierto'); }
+  else if (k === '/'){ e.preventDefault(); abrirBuscador(); }
   else if (k === 'escape'){ $('#ayuda').classList.remove('abierto'); cerrarMomento(); }
   else if (k >= '0' && k <= '9'){
     const orden = ['sol','mercurio','venus','tierra','marte','jupiter','saturno','urano','neptuno','pluton'];

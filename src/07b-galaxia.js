@@ -379,17 +379,17 @@ function verGalaxia(){
 }
 
 /* plantarse frente a una nebulosa, a dos radios y medio */
-function irANebulosa(n){
+function irANebulosa(n, silencioso){
   prepararViaje();
   const dir = n.pos.clone().normalize();
   const pos = n.pos.clone().addScaledVector(dir, -n.radio * LY * 2.5);
   mirarHacia(pos, n.pos.clone().sub(pos));
-  aviso(`${n.nombre}, a ${nf(n.ly, 0)} años luz de casa: una nube de gas de ${nf(n.radio * 2, 0)} años luz de ancho. `
+  if (!silencioso) aviso(`${n.nombre}, a ${nf(n.ly, 0)} años luz de casa: una nube de gas de ${nf(n.radio * 2, 0)} años luz de ancho. `
       + 'Su forma y sus colores aquí son procedurales; su posición, tamaño y distancia, reales.');
 }
 
 /* vista de un sistema con planetas: la estrella enfocada y sus órbitas en cuadro */
-function irASistema(id){
+function irASistema(id, silencioso){
   const e = porId[id]; if (!e) return;
   prepararViaje();
   const planetas = EXOPLANETAS.filter(p => p.padre === id);
@@ -401,7 +401,7 @@ function irASistema(id){
   state.verOrbitas = true;
   state.playing = false;
   sincronizar(); actualizarPanel();
-  aviso(`${e.def.nombre}: ${planetas.length} planeta${planetas.length === 1 ? '' : 's'} conocido${planetas.length === 1 ? '' : 's'}, `
+  if (!silencioso) aviso(`${e.def.nombre}: ${planetas.length} planeta${planetas.length === 1 ? '' : 's'} conocido${planetas.length === 1 ? '' : 's'}, `
       + `a ${nf(e.def.ly, e.def.ly < 100 ? 1 : 0)} años luz. Órbitas dibujadas circulares y coplanares: `
       + 'sus inclinaciones reales se desconocen.');
 }

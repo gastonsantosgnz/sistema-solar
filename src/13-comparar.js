@@ -16,7 +16,7 @@ const COMP_MAX = 10;
 const COMP_GRUPOS = [
   ['Estrella',   ['sol']],
   ['Planetas',   BODIES.filter(b => b.clase === 'planet').map(b => b.id)],
-  ['Enanos',     ['pluton', 'ceres']],
+  ['Enanos',     ['pluton', 'eris', 'makemake', 'haumea', 'gonggong', 'sedna', 'ceres']],
   ['Asteroides', ['vesta', 'palas', 'higia', 'eros', 'apofis']],
   ['Cometas',    ['halley', 'encke', 'churyumov', 'halebopp']],
   ['Lunas',      MOONS.map(m => m.id)],

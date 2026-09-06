@@ -360,10 +360,24 @@ body.momento #instrumentos,body.momento #bloqueNave,body.momento #tVuelo{display
 #cerrarAyuda:hover{color:var(--signal)}
 
 /* --- postal y selector del comparador --- */
-#postal,#comparar{position:fixed;inset:0;z-index:41;background:rgba(3,4,7,.86);
+#postal,#comparar,#buscador{position:fixed;inset:0;z-index:41;background:rgba(3,4,7,.86);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
   display:none;place-items:center;padding:20px}
-#postal.abierto,#comparar.abierto{display:grid}
+#postal.abierto,#comparar.abierto,#buscador.abierto{display:grid}
+#buscador.abierto{align-content:start;justify-content:center;padding-top:10vh}
+.cuadroBuscar{width:min(560px,calc(100vw - 40px));background:var(--panel-solido);
+  border:1px solid var(--rule-alta);padding:14px 16px 12px;display:flex;flex-direction:column;gap:10px}
+#busqIn{background:transparent;border:0;border-bottom:1px solid var(--rule-alta);color:var(--ink);
+  font-family:var(--serif);font-size:20px;padding:6px 2px;outline:none;caret-color:var(--signal);width:100%}
+#busqIn::placeholder{color:var(--muted);font-family:var(--cond);font-size:13px}
+#busqLista{display:flex;flex-direction:column;gap:1px;max-height:52vh;overflow-y:auto}
+#busqLista button{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  background:transparent;border:0;padding:6px 8px;cursor:pointer;text-align:left;
+  font-family:var(--cond);font-size:13px;color:var(--ink-2)}
+#busqLista button em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted);white-space:nowrap}
+#busqLista button.activo{color:var(--signal);background:rgba(255,91,65,.08)}
+#busqLista .calc{margin:0;padding:6px 8px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.busqPie{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 .cuadroPostal{width:min(440px,100%);background:var(--panel-solido);
   border:1px solid var(--rule-alta);padding:24px 26px 20px;position:relative;
   max-height:94vh;overflow-y:auto;display:flex;flex-direction:column;gap:13px;
@@ -589,6 +603,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   <aside id="lateral">
     <nav id="indice" class="panel bloque">
       <h4>Cuerpos</h4>
+      <button id="btnBuscar" class="ancho">Buscar &middot; /</button>
       <button id="btnSistema" class="ancho">Ver todo el sistema</button>
       <button id="btnComparar" class="ancho">Comparar tama&ntilde;os</button>
     </nav>
@@ -728,6 +743,14 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
   </div>
 </div>
 
+<div id="buscador" role="dialog" aria-modal="true" aria-label="Buscar">
+  <div class="cuadroBuscar">
+    <input id="busqIn" type="text" placeholder="Buscar un cuerpo, un sistema, una nebulosa, un momento&hellip;" autocomplete="off" spellcheck="false">
+    <div id="busqLista"></div>
+    <div class="busqPie">&uarr;&darr; elegir &middot; Enter ir &middot; Esc cerrar</div>
+  </div>
+</div>
+
 <div id="comparar" role="dialog" aria-modal="true" aria-labelledby="compTituloSel">
   <div class="cuadroPostal">
     <button id="cerrarSelComp" class="cerrarX" aria-label="Cerrar">&times;</button>
@@ -775,6 +798,7 @@ body.menu #btnMenu i:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
         <div class="l"><span>Girar alrededor del objetivo</span><kbd>arrastrar</kbd></div>
         <div class="l"><span>Acercar y alejar</span><kbd>rueda</kbd></div>
         <div class="l"><span>Seleccionar un cuerpo</span><kbd>clic</kbd></div>
+        <div class="l"><span>Buscar cualquier cosa</span><kbd>/</kbd></div>
         <div class="l"><span>Sol … Plutón</span><kbd>0 – 9</kbd></div>
         <div class="l"><span>Pausa</span><kbd>espacio</kbd></div>
         <div class="l"><span>Velocidad del tiempo</span><kbd>[ ]</kbd></div>
