@@ -54,6 +54,14 @@ de navegación, dibujadas a escala de cabina —lo único del universo que no es
 escala real, y se declara. En el teléfono, un cockpit táctil: pulgar izquierdo
 empuja, pulgar derecho apunta.
 
+Y se puede **salir de la galaxia**: la Vía Láctea existe como objeto 3D —220 000
+puntos procedurales y deterministas con posición real, bulbo, brazos, regiones HII
+y halo, con el Sol a 8.2 kpc del centro en la orientación verdadera— y Andrómeda al
+fondo, a 765 kpc, con su inclinación real. Desde dentro se ve como la banda de
+siempre; al alejarse más de unos cientos de años luz, la banda pintada cede el paso
+a la espiral. No cuesta nada mientras no sales del sistema: se genera en un rato
+libre, solo se dibuja lejos del Sol y se recorta sola si los fps caen.
+
 El **sonido** es sintetizado y honesto, sin un solo archivo de audio: solo se oye
 el empuje de la propia nave (vibración estructural, siguiendo la rampa real) y la
 sonificación de las magnetosferas al acercarse a Sol, Tierra, Júpiter o Saturno.
